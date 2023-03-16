@@ -1,0 +1,12 @@
+.msg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    margin: 0 0 16px 0;
+    border-radius: 2px;
+}
+
+.msg h3 {
+    color: var(--white02) !important;
+}

@@ -1,0 +1,146 @@
+
+.table-custom {
+  width: 100%;
+}
+
+.table-custom table {
+  background: var(--table01-stripped);
+  color: var(--blackOrWhite);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table-custom table th {
+  padding: 18px;
+  color: white;
+}
+
+.table-custom-01 th{
+  background: var(--table01);
+}
+
+.table-custom table th:first-child {
+  border-top-left-radius: 10px;
+}
+.table-custom table th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.table-custom table tr {
+  cursor: pointer;
+}
+.table-custom table tr:nth-child(even) {
+  background-color: #e7e7e7;
+}
+
+.table-custom table td {
+  text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--blackSoftOrWhite);
+}
+
+.table-custom table td {
+  border-right: 1px solid var(--blackSoftOrWhite);
+}
+
+.table-custom table tr:hover {
+  background-color: #d1d1d1e7;
+  box-shadow: var(--shadow01);
+  
+}
+
+.table-custom table td:first-child {
+  border-left: 1px solid var(--blackSoftOrWhite);
+}
+
+.table-custom table .selected {
+  background-color: var(--table01-selected) !important;
+}
+
+.table-custom .table-custom-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-custom .table-custom-footer h5{
+  color:var(--secondary02);
+  font-size: 14px;
+}
+
+.table-custom .pages {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px
+}
+
+.table-custom .pages .btn-custom{
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 100%;
+  background-color: var(--table01-page);
+  color: #fff;
+  margin: 8px 1px 0 0;
+  transition: .2s;
+}
+
+.table-custom .pages .last{
+  margin-left:4px;
+  width: 80px;
+  border-radius: 0px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.table-custom .pages .first{
+  margin-right:4px;
+  width: 80px;
+  border-radius: 0px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.table-custom .pages .btn-custom:hover{
+  background-color: var(--table01-page-hover);
+}
+
+.table-custom .pages .current-page {
+  background-color: var(--table01) !important;
+}
+
+.table-custom .table-custom-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin:40px 0 8px 0;
+}
+
+.table-custom .table-custom-info h4{
+  color: var(--black04);
+}
+
+.table-custom .table-custom-info i {
+  font-size: 18px;
+}
+
+.table-custom .table-custom-info-wrapper {
+  display: flex;
+  gap: 4px;
+}
+
+.table-custom .table-custom-info-wrapper .group-button {
+  display: flex;
+  gap:4px;
+}
+.table-custom .table-custom-info-wrapper .group-button .table-custom-info-button {
+  transition: .2s;
+  border-width: .1rem;
+}
+
+.table-custom .table-custom-info-wrapper .group-button .table-custom-info-button:hover {
+  border-color: var(--secondary02);
+  background-color: var(--secondary02) !important;
+}

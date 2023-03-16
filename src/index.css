@@ -1,0 +1,273 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  font-family: sans-serif
+}
+
+input {
+  font-size: 18px;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1, h2, h3, h4, h5,label,button,span {
+  color: var(--black04)
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.panel {
+  width: 60%;
+  margin: 3rem 3rem 24rem 3rem;
+  padding: 3rem;
+  background-color: transparent;
+}
+
+
+.hr {
+  height: 1px;
+  background-color: var(--black05);
+}
+
+.btn-custom {
+  width: 100px;
+  height: 40px;
+  border:none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 12px;
+  color:var(--whiteSoft01);
+  background-color: var(--container);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  gap: 6px;
+  transition: all 200ms ease-in-out;
+}
+
+.btn-long {
+  width: 160px;
+  justify-content: space-around;
+}
+
+.btn-medium {
+  width: 120px;
+  justify-content: space-around;
+}
+
+.btn-pill {
+  border-radius: 18px;
+}
+
+.btn-border {
+  background-color: transparent;
+  border: solid;
+  border-width: .12rem;
+  border-color: var(--secondary04);
+  color: var(--secondary02);
+}
+
+.btn-border:hover, .btn-border-min:hover {
+  background-color: var(--secondary02);
+  color: var(--white02)
+}
+
+.disabled {
+  pointer-events: none;
+  background-color: var(--disabled) !important;
+  color: var(--disabled) !important;
+}
+
+.disabled-border{
+  pointer-events: none;
+  border-color: var(--disabled);
+  color: var(--disabled);
+  transition: all 200ms ease-in-out;
+}
+
+.section {
+  border-radius: 4px;
+  background-color: var(--panel);
+  margin-bottom: 16px;
+  padding: 25px;
+  box-shadow: var(--shadow04);
+}
+
+.section .section-title {
+  margin-bottom: 8px;
+  color: var(--black04);
+}
+
+.transparent {
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.transparent:hover {
+  background-color: transparent !important;
+}
+
+select {
+  font-size: 20px;
+  border-radius: 4px;
+  border: none;
+  background-color: grey;
+  color:white;
+  padding:12px;
+  cursor: pointer;
+}
+
+.group-button{
+  display: flex;
+  align-items: center;
+  gap:8px;
+}
+
+.success{
+  background-color: var(--success);
+}
+
+.success-border{
+  border-color: var(--successText) !important;
+  color: var(--successText);
+}
+
+.success-border:hover,.btn-custom.success:hover {
+  background-color: var(--successText) !important;
+}
+
+.warning {
+  background-color: var(--warning);
+}
+
+.warning-border{
+  border-color: var(--warningText) !important;
+  color: var(--warningText);
+}
+
+.warning-border:hover,.btn-custom.warning:hover{
+  background-color: var(--warningText) !important;
+}
+
+.danger {
+  background-color: var(--danger);
+}
+
+.danger-border{
+  border-color: var(--dangerText);
+  color: var(--dangerText);
+}
+
+.danger-border:hover,.btn-custom.danger:hover {
+  background-color: var(--dangerText) !important;
+}
+
+.info {
+  background-color: var(--info);
+}
+
+.info-border{
+  border-color: var(--infoText);
+  color: var(--infoText);
+}
+
+.info-border:hover,.btn-custom.info:hover{
+  background-color: var(--infoText) !important;
+}
+
+
+
+.panel-header {
+  margin-bottom: 32px;
+}
+
+.panel-header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.panel-header-wrapper .group-button{
+  gap:4px
+}
+
+.panel-white {
+  background-color: var(--panel);
+  box-shadow: var(--shadow03);
+}
+
+.panel-header .panel-title {
+  font-size: 20px;
+  color: var(--black02);
+  margin-bottom:8px;
+}
+
+.panel-header .panel-subtitle {
+  font-size: 16px;
+  color: var(--black02);
+  margin-bottom:8px;
+}
+
+
+
+
+
+
+.menu {
+  margin-top: 6px;
+  background-color: var(--panel);
+  box-shadow: var(--shadow06);
+  position: absolute;
+  border-radius: 4px;
+  padding: 26px 28px;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  gap: 50%;
+}
+
+.menu-header .btn-custom {
+  font-size: 14px;
+  height: 30px;
+  width: 80px;
+}
+
+.menu-body h5 {
+  margin: 16px 0 4px 0;
+}
+
+.menu-body .group-button {
+  margin-bottom: 6px;
+}
+
+.menu-body {
+  margin-bottom: 18px;
+}
+
+
+.status-table {
+  padding: 6px 4px;
+  border-radius: 18px;
+  color: var(--white02);
+  margin: 0 10%;
+}
+
+
+

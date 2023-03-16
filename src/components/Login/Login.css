@@ -1,0 +1,132 @@
+.login .container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login .container-wrapper {
+    height: 500px;
+    width: 1000px;
+    border-radius: 12px;
+    background-color: var(--container);
+    box-shadow: var(--shadow);
+    display: flex;
+}
+
+.login .error {
+    margin-bottom: 4px;
+    width: 1000px;
+    border-radius: 2px;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    background-color: var(--danger01);
+}
+
+.login .error h5{
+    font-size: 20px;
+    color: var(--white);
+}
+
+.login img {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.login .login-form {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    width: 50%;
+}
+
+.login .login-form .login-form-header {
+    height: 25%;
+    padding: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login .login-form .login-form-body {
+    height: 48%;
+}
+
+.login .login-form .login-form-body a {
+    color: var(--whiteSoft02);
+}
+
+.login .login-form .login-form-body div {
+    display: flex;
+    justify-content: center;
+}
+.login .login-form .login-form-footer {
+    gap: 24px;
+    height: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 64px;
+}
+
+.login .login-form h2 {
+    color: var(--whiteSoft01);
+}
+
+.login form {
+    padding: 0px 64px;
+    margin-bottom: 10px;
+}
+
+.login form div {
+    align-items: center;
+    gap:5px;
+    justify-content: start !important;
+}
+
+.login form div input {
+    width: 18px;
+    height: 18px;
+}
+
+.login form div label {
+    color: var(--whiteSoft02);
+}
+
+.login form input {
+    background-color: var(--black03);
+    padding: 12px 18px;
+    font-size: 20px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 4px;
+    color: white;
+}
+
+.login form button {
+    margin-top: 8px;
+    height: 50px;
+    width: 100%;
+    border-radius: 20px;
+    padding: 12px 18px;
+    box-shadow: var(--shadow02);
+    color: var(--white);
+    background-color: var(--primary01);
+    transition: all 100ms ease-in-out;
+}
+
+.login form button:hover {
+    background-color: var(--primary01Hover);
+    scale: 1.01;
+}
+
+.login .login-form a.btn-custom {
+    background-color: var(--primary02);
+    border-radius: 20px;
+    padding: 12px 18px;
+    font-size: 20px;
+    width: 100%;
+}

@@ -1,0 +1,20 @@
+.search-wrapper {
+  display: flex;
+  align-items: center;
+}
+  
+.search-wrapper i {
+  left: 89%;
+  color: var(--secondary02);
+  position: relative;
+}
+  
+.search-wrapper input.search {
+  border: 1px solid var(--secondary04);
+  width: 300px;
+  height: 40px;
+  font-size: 16px;
+  background-color: var(--white02);
+  box-shadow: var(--shadow03);
+  padding: 0 0 0 12px;
+}

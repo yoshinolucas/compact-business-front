@@ -1,0 +1,51 @@
+.top {
+    height: 80px;
+    width: 100%;
+    background: var(--header);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.top nav ul {
+    list-style-type: none;
+    display: flex;
+    gap:20px;
+}
+
+.top nav ul li a {
+    color: var(--container);
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.top nav ul li button {
+    cursor: pointer;
+    border: 1px solid var(--black05);
+    background-color: transparent;
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+}
+
+.top nav ul li button i{
+    font-size: 18px;
+}
+
+.top nav ul li {
+    display: flex;
+    align-items: center;
+}
+
+.top nav ul .user-info {
+    gap:9px
+}
+
+.top nav ul .user-info h3 {
+    font-size: 16px;
+    margin-bottom: 3px;
+}
+
+.top nav ul .user-info h4 {
+    font-weight: 500;
+}

@@ -1,0 +1,54 @@
+
+.background-modal,.background-modal-shadow {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left:0;
+    top:0;
+}
+
+.background-modal-shadow {
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal{
+    border-radius: 12px;
+    width: 500px;
+    height: 250px;
+    background: var(--panel); 
+    box-shadow: var(--shadow02); 
+    padding:24px 32px;
+}
+
+.modal-content {
+    height: 85%;
+}
+
+.modal-header {
+    height: 15%;
+}
+
+.modal-header .btn-custom{
+    background-color: transparent;
+    color: black;
+    font-weight: 700;
+    float: right;
+}
+
+.modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 75%;
+}
+
+.modal-footer {
+    gap: 16px;
+    height: 25%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}

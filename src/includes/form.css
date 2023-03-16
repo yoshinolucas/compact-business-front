@@ -1,0 +1,51 @@
+.form-custom {
+    display: flex;
+    justify-content: center;
+}
+
+.form-section-title {
+    color: var(--black03);
+    margin-bottom: 6px
+}
+
+.form-wrapper {
+    display: flex;
+    gap: 24px;
+    padding: 32px 0;
+}
+
+.form-section {
+    width: 100%;
+}
+
+.form-input {
+    margin-bottom: 20px;
+}
+
+.form-input label {
+    color: var(--black04);
+    font-weight: 600;
+}
+
+.col-1,.col-2 {
+    width: 400px;
+}
+
+.form-input input{
+    display: block;
+    width: 100%;
+    box-shadow: var(--shadow03);
+    padding: 10px;
+    border: none;
+    border: 1px solid rgba(73, 73, 73, 0.3);
+    background: rgb(239, 239, 239);
+}  
+
+.form-input select {
+    box-shadow: var(--shadow03);
+    padding: 10px;
+    border: 1px solid rgba(73, 73, 73, 0.3);
+    background: rgb(239, 239, 239);
+    display: block;
+    width: 100%;
+}

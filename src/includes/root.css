@@ -1,0 +1,102 @@
+/* :root {
+  --background: #282c34;
+  --panel: #323843;
+  --container: #323843;
+
+  --shadow01: 0 5px 10px 0px rgba(0,0,0,0.2);
+  --shadow02: 11px 22px 42px rgba(0, 0, 0, 0.05);
+
+  --black01: black;
+  --black02: #444;
+  --black03: #1f1f1f;
+
+  --white: white;
+
+  --whiteSoft01: rgba(255, 255, 255, 0.84);
+  --whiteSoft02: rgba(255, 255, 255, 0.5);
+
+  --gradient01: linear-gradient(0deg, rgba(34,193,195,0.7525385154061625) 34%, rgba(34,171,195,1) 85%);
+  --gradient02: linear-gradient(0deg, rgba(34,193,195,0.49763655462184875) 34%, rgba(23,87,98,1) 85%);
+
+  --primary01: #247e62;
+  --primary01Hover: #1f6d54;
+
+  --primary02: #4daa8c;
+  --primary02Hover: #3a9075;
+
+  --table01: rgb(44, 44, 51);
+
+  --danger01: rgb(167, 55, 90);
+} */
+
+:root {
+
+    --background:rgba(226, 226, 226, 0.8);
+    --panel: rgb(248, 248, 248);
+    --container: #323843;
+    --containerSoft: #8d96a3;
+  
+    --text-black: #515865;
+    --secondary01: #323843;
+    --secondary02: #515865;
+    --secondary03: #727987;
+    --secondary04: #a5aebe;
+  
+    --white01: white;
+    --white02: #ebedef;
+  
+    --header: rgb(248, 248, 248);
+    --shadow01: 0 5px 10px 0px rgba(0,0,0,0.2);
+    --shadow02: 11px 22px 42px rgba(0, 0, 0, 0.1);
+    --shadow03: 0px 4px 4px 0px rgba(44, 44, 44, 0.03);
+    --shadow04: 1px 3px 8px 0px rgba(0, 0, 0, 0.2);
+    --shadow05: 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --shadow06: 5px 24px 15px rgba(0, 0, 0, 0.4);
+  
+    --black01: black;
+    --black02: #444;
+    --black03: #1f1f1f;
+    --black04: rgba(0, 0, 0, 0.6);
+    --black05: rgba(0, 0, 0, 0.3);
+  
+    --blackOrWhite: black;
+    --whiteOrBlack: white;
+  
+    --blackSoftOrWhite: rgba(0, 0, 0, 0.2);
+  
+    --whiteSoft01: rgba(255, 255, 255, 0.84);
+    --whiteSoft02: rgba(255, 255, 255, 0.5);
+    
+    --gradient01: linear-gradient(0deg, rgba(34,193,195,0.7525385154061625) 34%, rgba(34,171,195,1) 85%);
+    --gradient02: linear-gradient(0deg, rgba(34,193,195,0.49763655462184875) 34%, rgba(23,87,98,1) 85%);
+  
+    --primary01: #247e62;
+    --primary01Hover: #1f6d54;
+  
+    --primary02: #4daa8c;
+    --primary02Hover: #3a9075;
+  
+  
+    --success: rgb(40, 168, 100);
+    --successText: rgb(30, 122, 73);
+  
+    --info: rgba(40, 168, 149);
+    --infoText: rgb(26, 111, 98);
+    --infoHover: rgba(40, 168, 149, 1);
+  
+    --table01:#323843;
+    --table01-stripped: rgb(245, 245, 245);
+    --table01-page: #32384363;
+    --table01-page-hover: #323843cb;
+    --table01-selected: rgba(116, 175, 207, 0.8);
+    
+  
+    --danger: rgb(167, 55, 90);
+    --dangerText: rgb(105, 33, 56);
+  
+    --warning: rgb(233, 111, 66);
+    --warningText: rgb(219, 85, 36);
+  
+    --disabled: rgba(128, 128, 128, 0.7);
+   
+  }
