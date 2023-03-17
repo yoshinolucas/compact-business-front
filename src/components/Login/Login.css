@@ -24,7 +24,8 @@
     justify-content: center;
     align-items: center;
     height: 48px;
-    background-color: var(--danger01);
+    background-color: var(--danger);
+    color:var(--white02)
 }
 
 .login .error h5{
@@ -125,8 +126,13 @@
 
 .login .login-form a.btn-custom {
     background-color: var(--primary02);
+    color:var(--white02);
     border-radius: 20px;
     padding: 12px 18px;
     font-size: 20px;
     width: 100%;
+}
+
+.login-form-body span {
+    color:var(--white02)
 }

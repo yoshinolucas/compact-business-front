@@ -12,7 +12,7 @@ const Modal = ({ children, isOpen, id="modal", setIsOpen, windowClose = true }) 
         <div id={id} className="background-modal-shadow" onClick={handleWindowsClose}>
             <div className="modal">
                 <div className="modal-header">
-                    <button className='btn-custom' onClick={() => setIsOpen(false)}>X</button>
+                    <button className='transparent' onClick={() => setIsOpen(false)}><i className='fa fa-arrow-left'></i></button>
                 </div>
                 {children}
             </div>

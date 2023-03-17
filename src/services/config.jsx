@@ -13,9 +13,13 @@ export const formatApi = (obj) => {
     ); 
 }
 
+export const hasUpperCase = (str) => {
+    return /[A-Z]/.test(str);
+}
+
 export const STATUS_CADASTRO = {
-    1: <div className="status-table success">Ativo</div>,
+    1: <div className="status-table success">Cadastro completo</div>,
     2: <div className="status-table warning">Pendente</div>,
-    3: <div className="status-table info">Arquivado</div>,
-    4: <div className="status-table danger">Inativo</div>
+    3: <div className="status-table danger">Inativo</div>,
+    99: <div className="status-table info">Arquivado</div>,
 }

@@ -1,7 +1,7 @@
 import './SearchInput.css';
 
 
-const SearchInput = ({search, setSearch, setCurrentPage, setPages}) => {
+const SearchInput = ({search, setSearch, setCurrentPage, setPages, handleSelected}) => {
     return(
         <div className="search-wrapper">
             <i className="fa fa-search"></i>
@@ -10,6 +10,7 @@ const SearchInput = ({search, setSearch, setCurrentPage, setPages}) => {
             setSearch(e.target.value); 
             setCurrentPage(1); 
             setPages([1,2,3]);
+            handleSelected(e);
         }} 
         placeholder="Pesquisar"/>                                        
         </div> 

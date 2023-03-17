@@ -2,7 +2,7 @@ import './Login.css';
 import { Form, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { useEffect, useState } from 'react';
-import { login } from '../../services/auth';
+import { login, setUserId } from '../../services/auth';
 import { ClipLoader } from 'react-spinners';
 import { sleep } from '../../services/config';
 
@@ -42,8 +42,11 @@ const Login = () => {
                 return navigate("/home");
             })
             .catch((err) => {
-                if(err.code === "ERR_BAD_REQUEST") navigate("/login?error=1")
-                navigate("/login?error=2")
+                if(err.response.status === 404) {
+                    navigate("/login?error=1") 
+                } else {
+                    navigate("/login?error=2")
+                }
             })
         }
         

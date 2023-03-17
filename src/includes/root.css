@@ -75,8 +75,7 @@
   
     --primary02: #4daa8c;
     --primary02Hover: #3a9075;
-  
-  
+
     --success: rgb(40, 168, 100);
     --successText: rgb(30, 122, 73);
   
@@ -97,6 +96,9 @@
     --warning: rgb(233, 111, 66);
     --warningText: rgb(219, 85, 36);
   
+
     --disabled: rgba(128, 128, 128, 0.7);
+    --disabledText: rgba(128, 128, 128, 1); 
+    --disabled-background: rgba(128, 128, 128, 0.3);
    
   }

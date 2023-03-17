@@ -115,6 +115,10 @@
         justify-content: center;
     }
 
+    .table-custom-info-wrapper .cols-menu .group-button {
+        justify-content: flex-start;
+    }
+
     .search-wrapper input.search {
         width: 89% !important;
     }

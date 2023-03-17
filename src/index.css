@@ -28,7 +28,7 @@ h1, h2, h3, h4, h5,label,button,span {
 
 .panel {
   width: 60%;
-  margin: 3rem 3rem 24rem 3rem;
+  margin: 3rem 3rem 6rem 3rem;
   padding: 3rem;
   background-color: transparent;
 }
@@ -92,13 +92,14 @@ h1, h2, h3, h4, h5,label,button,span {
 .disabled-border{
   pointer-events: none;
   border-color: var(--disabled);
-  color: var(--disabled);
+  color: var(--disabledText);
   transition: all 200ms ease-in-out;
+  background-color: var(--disabled-background);
 }
 
 .section {
   border-radius: 4px;
-  background-color: var(--panel);
+  background-color: var(--container);
   margin-bottom: 16px;
   padding: 25px;
   box-shadow: var(--shadow04);
@@ -106,7 +107,7 @@ h1, h2, h3, h4, h5,label,button,span {
 
 .section .section-title {
   margin-bottom: 8px;
-  color: var(--black04);
+  color: var(--white02);
 }
 
 .transparent {
@@ -123,8 +124,7 @@ select {
   font-size: 20px;
   border-radius: 4px;
   border: none;
-  background-color: grey;
-  color:white;
+  background-color: var(--panel);
   padding:12px;
   cursor: pointer;
 }
@@ -133,6 +133,19 @@ select {
   display: flex;
   align-items: center;
   gap:8px;
+}
+
+.neutral{
+  background-color: var(--secondary02);
+}
+
+.neutral-border{
+  border-color: var(--secondary02) !important;
+  color: var(--secondary01);
+}
+
+.neutral-border:hover,.btn-custom.neutral:hover {
+  background-color: var(--secondary01) !important;
 }
 
 .success{
@@ -228,6 +241,7 @@ select {
 
 .menu {
   margin-top: 6px;
+  margin-right:24px;
   background-color: var(--panel);
   box-shadow: var(--shadow06);
   position: absolute;
@@ -246,7 +260,7 @@ select {
 .menu-header .btn-custom {
   font-size: 14px;
   height: 30px;
-  width: 80px;
+  padding:0
 }
 
 .menu-body h5 {

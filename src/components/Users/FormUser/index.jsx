@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Form, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../../services/api';
-import { formatApi } from '../../../services/config';
+import { formatApi, hasUpperCase } from '../../../services/config';
 import Header from '../../../includes/Header';
 import './FormUser.css';
 import Footer from '../../../includes/Footer';
@@ -14,9 +14,11 @@ const FormUser = () => {
         email: "", 
         password: "", 
         nome:"",
-        sobrenome: "", 
+        sobrenome: null, 
         status: 2, 
-        previlegio: 3
+        previlegio: 3,
+        equipe: null,
+        arquivado: 0
     };
     const [ msg, setMsg ] = useState({show: false});
     const [ inputs, setInputs ] = useState(initialValues);
@@ -33,21 +35,24 @@ const FormUser = () => {
         || inputs.email === "" || inputs.nome === "") { 
             setMsg({show: true, content:"Por favor, verifique os campos obrigatórios.", style: "danger"}) 
         } else {
-            if(params.get('id') !== '0' && params.get('copy') !== '1') {
-                var updateUser = {
-                    ids: [inputs.id],
-                    columns:[],
-                    user: inputs
-                }
-                api.post("/users/update", updateUser)
-                .then(res => navigate("/users?msg=2"))
-                .catch(err => navigate("/users?msg=4"));
+            if(hasUpperCase(inputs.username)) {
+                setMsg({show:true, content:"Username deve conter apenas letras minúsculas e números", style:"warning"})
             } else {
-                api.post("/users/create", inputs)
-                .then(res => navigate("/users?msg=1"))
-                .catch(err => navigate("/users?msg=4"))
+                if(params.get('id') !== '0' && params.get('copy') !== '1') {
+                    var updateUser = {
+                        ids: [inputs.id],
+                        columns:[],
+                        user: inputs
+                    }
+                    api.post("/users/update", updateUser)
+                    .then(res => navigate("/users?msg=2"))
+                    .catch(err => navigate("/users?msg=4"));
+                } else {
+                    api.post("/users/create", inputs)
+                    .then(res => navigate("/users?msg=1"))
+                    .catch(err => navigate("/users?msg=4"))
+                }
             }
-            
         }  
     }
 
@@ -160,8 +165,17 @@ const FormUser = () => {
                                                             value={inputs.password} 
                                                             name="password" 
                                                             type="password"/>
+                                                        </div> 
+                                                        <div className='form-input'>
+                                                            <label>Equipe:</label>
+                                                            <input 
+                                                            onChange={handleChanges} 
+                                                            value={inputs.equipe} 
+                                                            name="equipe" 
+                                                            type="text"/>
                                                         </div>                                                                       
                                                     </div>  
+                                                    
                                             </div>
                                         </div>
                                         

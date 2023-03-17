@@ -7,25 +7,36 @@ import Modal from "../Modal";
 import Footer from "../../includes/Footer";
 import SearchInput from "../SearchInput";
 import MsgText from "../MsgText";
-import { STATUS_CADASTRO } from "../../services/config";
+import { formatApi, STATUS_CADASTRO } from "../../services/config";
 import CheckBoxPill from "../CheckBoxPill";
+import CheckBoxSwitch from "../CheckBoxSwitch";
 
 const Users = () => {
+
+
     const maxItems = 15;
     const[ allSelect, setAllSelect ] = useState([]);
     const[ params ] = useSearchParams();
     const navigate = useNavigate();
     const[ msg, setMsg ] = useState({show: false, content: "", style: ""});
     const[ users, setUser ] = useState([]);
-    const[ infoRecords, setInfoRecord ] = useState({totalPages: 1, totalRecords: 0});
+    const[ infoRecords, setInfoRecord ] = useState({totalPages: 1, totalRecords: 0,equipeOptions: []});
     const[ modalRemove, setModalRemove ] = useState(false);
-    const [ modalStatus, setModalStatus ] = useState(false);
+    const[ modalMultiple, setModalMultiple ] = useState(false);
+    const[ modalMain, setModalMain] = useState(false);
+    
 
     const[ openFilter, setOpenFilter] = useState(false);
     const[ filters , setFilters] = useState({
         status: [1,2],
-        data: [1]
+        equipe: [],
+        arquivado: false
     });
+
+    const [ openColumn, setOpenColumn ] = useState(false);
+    const [ columns, setColumns ] = useState(
+        ['Nome completo','Username','Email','Equipe','Status no Sistema']
+    )
 
     const [ search, setSearch ] = useState("");
     const [ currentPage, setCurrentPage] = useState(1);
@@ -106,7 +117,14 @@ const Users = () => {
 
     const handleOpenFilter = (e) => {
         setMsg({show:false});
+        setOpenColumn(false);
         setOpenFilter(!openFilter);
+    }
+    
+    const handleOpenColumn = (e) => {
+        setMsg({show:false});
+        setOpenFilter(false);
+        setOpenColumn(!openColumn);
     }
 
     const handleFilter = (e) => {
@@ -120,15 +138,27 @@ const Users = () => {
             else newStatus.push(value);
             setFilters(v => ({...v,[name]: newStatus}))
         }
+
+        if(name === "equipe"){
+            var newEquipe = filters.equipe;
+            value = value.trim();
+            if(newEquipe.includes(value)) newEquipe = newEquipe.filter(v => v !== value)
+            else newEquipe.push(value);
+            setFilters(v => ({...v,[name]: newEquipe}))
+        }
+
+        if(name === "arquivado") {
+            setFilters(v => ({...v,[name]: !filters.arquivado}))
+        }
     }
 
     const handleArchive = (e) => {
         e.preventDefault();
         var json = {
             ids:allSelect, 
-            columns: ['status'],
+            columns: ['arquivado'],
             user: {
-                status: 3
+                arquivado: 1
             }
         };
         api.post('/users/update', json)
@@ -138,16 +168,15 @@ const Users = () => {
         }).catch(err => console.log(err))
     }
 
-    const handleStatus = (e) => {
+    const handleMultiple = (e) => {
         e.preventDefault();
         setMsg({show:false});
-        setModalStatus(true);
+        setModalMultiple(true);
     }
 
     const handleStatusConfirm = (e) => {
         e.preventDefault();
     }
-
 
     useEffect(() => {
         if(params.get("msg") === '1') setMsg({show:true, content: "Usuário cadastrado com sucesso.", style: "success"});
@@ -159,9 +188,10 @@ const Users = () => {
             "maxItems" : maxItems,
             "currentPage" : currentPage > infoRecords.totalPagesWithSearch ? 1 : currentPage,
             "search" : search,
-            "filters": filters
+            "filters": filters,
         };
 
+        console.log(data)
         api.post('/users/table', data)
         .then((res)=>{
             setInfoRecord(
@@ -169,10 +199,13 @@ const Users = () => {
                     totalPages: res.data.totalPages,
                     totalRecords: res.data.totalRecords,
                     totalPagesWithSearch: res.data.totalPagesWithSearch,
-                    totalRecordsWithSearch: res.data.totalRecordsWithSearch
-                })
+                    totalRecordsWithSearch: res.data.totalRecordsWithSearch,
+                    equipeOptions: res.data.equipeOptions
+                });
+            
             setUser(res.data.users)
         }).catch(err => console.log(err));
+
     },[params,filters,search, currentPage,infoRecords.totalPagesWithSearch]);
 
     return(
@@ -190,7 +223,7 @@ const Users = () => {
                                         <h3 className="panel-title">Home / Equipe</h3>
 
                                         <div className="group-button">
-                                            <Link to="/users/edit?id=0" className="btn-custom success btn-long btn-pill"><i className="fa-solid fa-add"></i>Novo Usuário</Link>
+                                            <Link to="/users/edit?id=0" className="btn-custom success btn-medium btn-pill"><i className="fa-solid fa-add"></i>Novo</Link>
                                         </div>
                                     </div>
                                     <MsgText show={msg.show} style={msg.style} content={msg.content}/>
@@ -198,11 +231,7 @@ const Users = () => {
                                     <div className="hr"></div>
                                 </div>
 
-                                
-
                                 <div className="panel-body">
-
-
                                         <div 
                                         className="group-button"
                                         style={{justifyContent: 'flex-end', marginBottom: '16px'}}
@@ -221,18 +250,17 @@ const Users = () => {
                                                     <div className="group-button">
                                                         <Link to={`/users/edit?id=${allSelect[0]}&copy=1`} className={document.querySelectorAll(".selected").length === 1 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-copy"></i>Duplicar</Link>
                                                         <button onClick={handleArchive} className={allSelect.length > 0 ? "btn-custom btn-medium info" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-inbox"></i>Arquivar</button>
-                                                        <button onClick={handleStatus}  className={allSelect.length > 0 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-user"></i>Mudar Status</button>
+                                                        <button onClick={handleMultiple}  className={allSelect.length > 0 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-edit"></i>Alterar dados</button>
                                                         
                                                     </div>      
                                                     <div className="group-button">
                                                         <button className={allSelect.length > 0 ? "btn-custom btn-medium danger" : "btn-custom btn-border btn-medium disabled-border"} onClick={handleRemove}><i className="fa-solid fa-trash"></i>Excluir</button>
+                                                        <button onClick={e => setModalMain(e)} className="btn-custom danger">Main</button>
                                                     </div>                                              
                                                 </div>
                                                                                               
                                             </div>                                                                                                                               
-                                        </div>
-                                        
-                                       
+                                        </div>                
                                         <div className="table-custom">
 
                                             <div className="table-custom-info">
@@ -247,6 +275,7 @@ const Users = () => {
                                                     setSearch={setSearch}
                                                     setCurrentPage={setCurrentPage}
                                                     setPages={setPages}
+                                                    handleSelected={handleSelected}
                                                     />
                                                     <div className="group-button">   
                                                         <div className="dropdown">
@@ -274,9 +303,9 @@ const Users = () => {
                                                                             onClick={handleFilter} 
                                                                             name="status" 
                                                                             value={1} 
-                                                                            placeholder="Ativos" 
+                                                                            placeholder="Cadastro completo" 
                                                                             css="success" 
-                                                                            size="medium"
+                                                                            size="long"
                                                                             />
                                                                                                         
                                                                             <CheckBoxPill 
@@ -299,44 +328,41 @@ const Users = () => {
                                                                             css="danger"
                                                                             size="medium"/>
                                                                             <CheckBoxPill 
-                                                                            defaultChecked={filters.status.includes(3)}
+                                                                            defaultChecked={filters.arquivado === true}
                                                                             onClick={handleFilter} 
-                                                                            name="status"
-                                                                            value={3} 
+                                                                            name="arquivado"
+                                                                            value={true} 
                                                                             placeholder="Arquivados" 
-                                                                            css="info" 
-                                                                            />
-                                                                        </div>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            placeholder="Em férias" 
-                                                                            css="warning"
-                                                                            size="medium"/>
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Férias próximo mês" 
                                                                             css="info" 
                                                                             />
                                                                         </div>
 
                                                                         <h5>Equipe</h5>
                                                                         <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="status" 
-                                                                            placeholder="Contabilidade" 
-                                                                            css="danger"
-                                                                            size="medium"/>
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Design" 
-                                                                            css="info" 
-                                                                            />
-                                                                            
+                                                                            <CheckBoxPill          
+                                                                            checked={filters.equipe.length > 0 ? false : true}
+                                                                            placeholder="Qualquer equipe"
+                                                                            css="info"
+                                                                            size="long"/>
                                                                         </div>
+
+                                                                        {
+                                                                            infoRecords.equipeOptions.map((equipe, i) => {
+                                                                                return (
+                                                                                    <div key={`equipe-${i}`} className="group-button">
+                                                                                        <CheckBoxPill 
+                                                                                        defaultChecked={filters.equipe.includes(equipe.equipe ? equipe.equipe.trim() : "Indefinido")}
+                                                                                        onClick={handleFilter} 
+                                                                                        name="equipe" 
+                                                                                        value={equipe.equipe ? equipe.equipe : "Indefinido"}
+                                                                                        placeholder={equipe.equipe ? equipe.equipe : "Indefinido"} 
+                                                                                        css={equipe.equipe ? "success" : "neutral"}
+                                                                                        size="long"/>
+                                                                                    </div>
+                                                                                )
+                                                                            })
+                                                                            
+                                                                        }
 
                                                                         <h5>Data de cadastro</h5>
                                                                         <div className="group-button">
@@ -423,9 +449,68 @@ const Users = () => {
                                                                 
                                                             </div>
 
+                                                        }
+                                                        </div>
+                                                        <div className="dropdown">
+                                                            <button 
+                                                            className="btn-custom btn-border table-custom-info-button"
+                                                            onClick={handleOpenColumn}
+                                                            ><i className="fa-solid fa-table-columns"></i> Colunas</button>                                                          
+                                                            { openColumn &&
+                                                                <div className="menu cols-menu">
+                                                                    <div className="menu-wrapper">
+                                                                        <div className="menu-header">
+                                                                            <button onClick={e => setOpenColumn(false)} className="transparent"><i className="fa fa-arrow-left"></i></button>
+                                                                            <button className="btn-custom btn-pill btn-border">Redefinir</button>
+                                                                        </div>
+                                                                        <div className="menu-body">
+                                                                            <h5>Colunas predefinidas</h5>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch name="nome" defaultChecked={true} />
+                                                                                <label>Nome</label>
+                                                                            </div>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch name="sobrenome" defaultChecked={true} />
+                                                                                <label>Sobrenome</label>
+                                                                            </div>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch name="username" defaultChecked={true} />
+                                                                                <label>Username</label>
+                                                                            </div>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch name="email" defaultChecked={true} />
+                                                                                <label>Email</label>
+                                                                            </div>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch name="status" defaultChecked={true} />
+                                                                                <label>Status no Sistema</label>
+                                                                            </div>
+                                                                            <h5>Outras colunas</h5>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch />
+                                                                                <label>Privilégios</label>
+                                                                            </div>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch />
+                                                                                <label>Data de cadastro / admissão</label>
+                                                                            </div>
+                                                                            <div className="group-button">
+                                                                                <CheckBoxSwitch />
+                                                                                <label>Última atualização</label>
+                                                                            </div>
+                                                                        
+
+                                                                        </div>
+
+                                                                    </div>
+                                                                    
+
+                                                                </div>
                                                             }
                                                         </div>
-                                                        <button className="btn-custom btn-border table-custom-info-button"><i className="fa-solid fa-table-columns"></i> Colunas</button>
+                                                        
+                                                        
+
                                                         <button className="btn-custom btn-border table-custom-info-button"><i className="fa-solid fa-arrow-down-wide-short"></i> Ordem</button>
                                                     </div>
                                                 </div>
@@ -438,32 +523,36 @@ const Users = () => {
                                                         <th id="user_all"><input 
                                                         onChange={() => {}} 
                                                         checked={
-                                                            allSelect.length === maxItems ? true 
-                                                            : 
-                                                            allSelect.length === infoRecords.totalRecords ?
-                                                            true
-                                                            :
-                                                            false} 
+                                                            
+                                                            allSelect.length === maxItems ||
+                                                            allSelect.length === infoRecords.totalRecords ||
+                                                            allSelect.length === infoRecords.totalRecordsWithSearch
+                                                            ? true : false
+                                                        
+                                                            } 
                                                         type="checkbox" 
                                                         onClick={handleSelected}
                                                         /></th>
-                                                        <th>Nome</th>
-                                                        <th>Sobrenome</th>
-                                                        <th>Username</th>
-                                                        <th>Email</th>
-                                                        <th>Status</th>
+                                                        {
+                                                            columns.map((column, i) => {
+                                                                return(
+                                                                    <th key={`column-${i}`}>{column}</th>
+                                                                )
+                                                            })
+                                                        }
+                                                        
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {users.map((user, i) => {
                                                         return(
-                                                            <tr onClick={e => navigate(`/users/edit?id=${e.target.parentElement.id}`)} key={i} id={user.id}>
+                                                            <tr onClick={e => navigate(`/users/edit?id=${e.target.parentElement.id}`)} key={`user-${i}`} id={user.id}>
                                                                 <td onClick={e => { e.stopPropagation(); handleSelected(e) }}><input type="checkbox" /></td>
-                                                                <td>{user.nome}</td>
-                                                                <td>{user.sobrenome}</td>
+                                                                <td>{`${user.nome} ${user.sobrenome}`}</td>
                                                                 <td>{user.username}</td>
                                                                 <td>{user.email}</td>
-                                                                <td onClick={e=>e.stopPropagation(e)}>{STATUS_CADASTRO[user.status]}</td>
+                                                                <td>{user.equipe ? user.equipe : "Indefinido"}</td>
+                                                                <td onClick={e=>e.stopPropagation(e)}>{STATUS_CADASTRO[user.arquivado === 1 ? 99 : user.status]}</td>
                                                             </tr>
                                                         );
                                                     })}                                         
@@ -471,7 +560,7 @@ const Users = () => {
                                             </table>
 
                                             <div className="table-custom-footer">
-                                                <h5>Total de registro: {infoRecords.totalRecords} usuários</h5>
+                                                <h5>Total de {infoRecords.totalRecords} registros</h5>
                                             
                                                 <div className="pages">
                                                     
@@ -551,34 +640,62 @@ const Users = () => {
                                             </div>
                                             
                                         </div>                   
- 
                                 </div>
-
-
                             </div>
                         </div>
                     
                     <Modal isOpen={modalRemove} setIsOpen={setModalRemove}>
+                        <div className="modal-body">
+                            <h3>Tem certeza que deseja excluir {allSelect.length} usuário(s) do sistema?</h3>
+                        </div>
+                        <div className="modal-footer">
+                            <button onClick={() => setModalRemove(false)} className="btn-custom warning">Cancelar</button>
+                            <button onClick={handleRemoveConfirm} className="btn-custom success">Confirmar</button>
+                        </div>
+                    </Modal>
+
+                    <Modal isOpen={modalMultiple} setIsOpen={setModalMultiple}>
                         <div className="modal-content">
                             <div className="modal-body">
-                                <h3>Tem certeza que deseja excluir {allSelect.length} usuário(s) do sistema?</h3>
+                                <div className="modal-body-wrapper">
+                                    <div className="form-input">
+                                        <label>Mover para equipe:</label>
+                                        <select>
+                                        {
+                                            
+                                            infoRecords.equipeOptions.map((item, i) => {
+                                                return (
+                                                    <option key={`option-${i}`}>
+                                                        {item.equipe ?? "Indefinido"}
+                                                    </option>
+                                                )
+                                            })
+                                            
+                                        }
+                                        </select>
+                                    </div>
+
+                                    <div className="form-input">
+                                        <label>Desarquivar selecionados</label>
+                                        <input type="checkbox"/>
+                                    </div>
+                                </div>
+                               
+                                
                             </div>
                             <div className="modal-footer">
-                                <button onClick={() => setModalRemove(false)} className="btn-custom warning">Cancelar</button>
-                                <button onClick={handleRemoveConfirm} className="btn-custom success">Confirmar</button>
+                                <button onClick={() => setModalMultiple(false)} className="btn-custom warning">Cancelar</button>
+                                <button onClick={handleStatusConfirm} className="btn-custom success">Salvar</button>
                             </div>
                         </div>
                     </Modal>
 
-                    <Modal isOpen={modalStatus} setIsOpen={setModalStatus}>
-                        <div className="modal-content">
-                            <div className="modal-body">
+                    <Modal isOpen={modalMain} setIsOpen={setModalMain}>
+                        <div className="modal-body">
+                            <div className="form-input">
                                 
                             </div>
-                            <div className="modal-footer">
-                                <button onClick={() => setModalStatus(false)} className="btn-custom warning">Cancelar</button>
-                                <button onClick={handleStatusConfirm} className="btn-custom success">Confirmar</button>
-                            </div>
+                                
                         </div>
                     </Modal>
                 </div>          

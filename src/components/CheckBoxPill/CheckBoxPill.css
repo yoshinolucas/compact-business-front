@@ -9,6 +9,10 @@ input[type=checkbox]:checked + label.success-checkbox {
   background-color: var(--success);
 }
 
+input[type=checkbox]:checked + label.neutral-checkbox {
+  background-color: var(--secondary02);
+}
+
 input[type=checkbox]:checked + label.warning-checkbox {
   background-color: var(--warning);
 }
@@ -34,6 +38,11 @@ label.btn-long {
   align-items: center;
   padding: 8px 18px;
   box-shadow: var(--shadow05);
+}
+
+.neutral-checkbox {
+  border: 1px solid var(--secondary02);
+  color: var(--secondary02)
 }
 
 .success-checkbox {
