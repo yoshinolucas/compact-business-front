@@ -41,17 +41,20 @@
     --secondary02: #515865;
     --secondary03: #727987;
     --secondary04: #a5aebe;
+    --secondary05: #dbdfe6;
   
     --white01: white;
     --white02: #ebedef;
   
     --header: rgb(248, 248, 248);
+    --sub-top: linear-gradient(58deg, rgba(84,166,145,1) 12%, rgba(36,126,98,1) 30%, rgba(49,128,103,1) 51%, rgba(77,170,140,1) 80%, rgba(77,170,170,1) 91%);
     --shadow01: 0 5px 10px 0px rgba(0,0,0,0.2);
     --shadow02: 11px 22px 42px rgba(0, 0, 0, 0.1);
     --shadow03: 0px 4px 4px 0px rgba(44, 44, 44, 0.03);
     --shadow04: 1px 3px 8px 0px rgba(0, 0, 0, 0.2);
     --shadow05: 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
     --shadow06: 5px 24px 15px rgba(0, 0, 0, 0.4);
+    --shadow07: 0px 2px 6px rgba(0, 0, 0, 0.1);
   
     --black01: black;
     --black02: #444;
@@ -88,6 +91,12 @@
     --table01-page: #32384363;
     --table01-page-hover: #323843cb;
     --table01-selected: rgba(116, 175, 207, 0.8);
+
+    --table02:var(--panel);
+    --table02-stripped: var(--panel);
+    --table02-page: #32384363;
+    --table02-page-hover: #323843cb;
+    --table02-selected: rgba(116, 175, 207, 0.8);
     
   
     --danger: rgb(167, 55, 90);

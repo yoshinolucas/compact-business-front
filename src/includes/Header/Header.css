@@ -1,51 +1,71 @@
+
 .top {
-    height: 80px;
+    height: 60px;
     width: 100%;
     background: var(--header);
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
+    border-bottom: 1px solid var(--background);
 }
 
-.top nav ul {
+.top ul{
     list-style-type: none;
-    display: flex;
-    gap:20px;
 }
 
-.top nav ul li a {
-    color: var(--container);
-    text-decoration: none;
-    font-size: 18px;
-}
-
-.top nav ul li button {
-    cursor: pointer;
-    border: 1px solid var(--black05);
-    background-color: transparent;
-    height: 40px;
-    width: 40px;
+.top .dropdown button {
     border-radius: 100%;
-}
-
-.top nav ul li button i{
-    font-size: 18px;
-}
-
-.top nav ul li {
+    width: 35px;
+    height: 35px;
+    border: 1px solid var(--black05);
     display: flex;
+    justify-content: center;
     align-items: center;
 }
 
-.top nav ul .user-info {
+.top .dropdown button i{
+    font-size: 14px;
+}
+
+.top .dropdown {
     gap:9px
 }
 
-.top nav ul .user-info h3 {
-    font-size: 16px;
-    margin-bottom: 3px;
+.top .dropdown h3 {
+    font-size: 14px;
 }
 
-.top nav ul .user-info h4 {
+.top .dropdown h4 {
     font-weight: 500;
+    font-size: 13px;
+
+}
+
+.top .dropdown p {
+    font-size: 13px;
+}
+.top .dropdown nav ul li {
+    margin-bottom:8px
+}
+
+.sub-top {
+    height: 64px;
+    width: 100%;
+    background: var(--sub-top);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: var(--shadow01);
+}
+
+.sub-top nav ul {
+    list-style-type: none;
+    display: flex;
+    gap:48px;
+}
+
+.sub-top nav ul li a {
+    color: var(--white02);
+    text-decoration: none;
+    font-size: 18px;
 }

@@ -37,6 +37,7 @@ label.btn-long {
   display: flex;
   align-items: center;
   padding: 8px 18px;
+  justify-content: center;
   box-shadow: var(--shadow05);
 }
 

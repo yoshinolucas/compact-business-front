@@ -1,0 +1,29 @@
+.modal-records-wrapper {
+    margin:12px 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.modal-records-wrapper ul {
+    list-style: none;
+}
+
+.modal-records-wrapper table,.modal-records-wrapper td{
+    border-collapse: collapse;
+    border:1px solid var(--secondary03);
+}
+
+.modal-records-wrapper td:first-child {
+    background-color: var(--secondary02);
+    color:var(--white02)
+}
+
+.modal-records-wrapper td {
+    padding: 8px;
+}
+
+.modal-records-wrapper h4 {
+    display: flex;
+    justify-content: center;
+    margin-bottom:8px
+}

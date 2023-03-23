@@ -5,7 +5,7 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: var(--panel);
   font-family: sans-serif
 }
 
@@ -17,9 +17,10 @@ button {
   cursor: pointer;
 }
 
-h1, h2, h3, h4, h5,label,button,span {
+h1, h2, h3, h4, h5,label,button,span,p {
   color: var(--black04)
 }
+
 
 .container {
   display: flex;
@@ -28,8 +29,8 @@ h1, h2, h3, h4, h5,label,button,span {
 
 .panel {
   width: 60%;
-  margin: 3rem 3rem 6rem 3rem;
-  padding: 3rem;
+  margin: 1.4rem 3rem 12rem 3rem;
+  padding: 1.4rem 3rem 3rem 3rem;
   background-color: transparent;
 }
 
@@ -81,6 +82,12 @@ h1, h2, h3, h4, h5,label,button,span {
 .btn-border:hover, .btn-border-min:hover {
   background-color: var(--secondary02);
   color: var(--white02)
+}
+
+.wrapper {
+  display: flex;
+  gap:8px;
+  align-items: center;
 }
 
 .disabled {
@@ -219,34 +226,54 @@ select {
 
 .panel-white {
   background-color: var(--panel);
-  box-shadow: var(--shadow03);
+  box-shadow: var(--shadow02);
 }
 
 .panel-header .panel-title {
-  font-size: 20px;
-  color: var(--black02);
-  margin-bottom:8px;
+  align-items: center;
+  display: flex;
+}
+
+.panel-header .panel-title h3 {
+  margin-left:4px;
+  font-size: 24px;
 }
 
 .panel-header .panel-subtitle {
   font-size: 16px;
-  color: var(--black02);
-  margin-bottom:8px;
+  margin-top:8px;
 }
 
+.select-custom {
+  border: 1px solid var(--disabled);
+  font-size: 16px;
+  height: 38px;
+  width: 80%;
+  padding:0 16px;
+}
 
+.select-multiple{
+  height: 110px;
+  overflow-y: auto;
+  border-radius: 4px;
+  margin-top:7px
+}
 
+.menu .select-multiple {
+  width: 100%;
+}
 
-
+.select-multiple > * {
+  margin: 4px 0;
+}
 
 .menu {
   margin-top: 6px;
-  margin-right:24px;
   background-color: var(--panel);
   box-shadow: var(--shadow06);
   position: absolute;
   border-radius: 4px;
-  padding: 26px 28px;
+  padding: 26px 18px;
 }
 
 .menu-header {
@@ -277,10 +304,46 @@ select {
 
 
 .status-table {
-  padding: 6px 4px;
+  padding: 5px;
   border-radius: 18px;
   color: var(--white02);
   margin: 0 10%;
+}
+
+.wrapper-content {
+  margin:10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:10px;
+}
+
+.primary {
+  background-color: var(--primary01);
+}
+
+.primary02 {
+  background-color: var(--primary02);
+}
+
+.hidden {
+  display: none;
+}
+
+.filters .wrapper-content label {
+  font-size: 14px;
+}
+
+.filters .wrapper-content input{
+  font-size: 14px;
+  width: 120px;
+  border-radius: 4px;
+  box-shadow: var(--shadow05);
+}
+
+a {
+  text-decoration: none;
+  color:var(--secondary02)
 }
 
 

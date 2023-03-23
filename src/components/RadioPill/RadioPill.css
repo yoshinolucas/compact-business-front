@@ -1,0 +1,67 @@
+.radio-hidden input[type=radio],.select-multiple input[type=radio],.menu-wrapper input[type=radio]{display:none;}
+
+
+input[type=radio]:checked + label.btn-radio {
+  color: var(--white02);
+}
+
+input[type=radio]:checked + label.success-radio {
+  background-color: var(--success);
+}
+
+input[type=radio]:checked + label.neutral-radio {
+  background-color: var(--secondary02);
+}
+
+input[type=radio]:checked + label.warning-radio {
+  background-color: var(--warning);
+}
+
+input[type=radio]:checked + label.danger-radio {
+  background-color: var(--danger);
+}
+
+input[type=radio]:checked + label.info-radio {
+  background-color: var(--info);
+}
+input[type=radio]:checked + label.btn-radio {
+  color: var(--white02);
+}
+
+label.btn-long {
+  width: 180px;
+}
+
+.btn-radio {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 18px;
+  box-shadow: var(--shadow05);
+}
+
+.neutral-radio {
+  border: 1px solid var(--secondary02);
+  color: var(--secondary02)
+}
+
+.success-radio {
+  border: 1px solid var(--success);
+  color: var(--success)
+}
+
+.warning-radio {
+  color:var(--warning);
+  border: 1px solid var(--warning);
+}
+
+.danger-radio {
+  color:var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.info-radio {
+  color:var(--info);
+  border: 1px solid var(--info);
+}

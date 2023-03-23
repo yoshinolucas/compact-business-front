@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Form, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../../services/api';
-import { formatApi, hasUpperCase } from '../../../services/config';
+import { formatApi, hasUpperCase, register } from '../../../services/config';
 import Header from '../../../includes/Header';
 import './FormUser.css';
 import Footer from '../../../includes/Footer';
 import MsgText from '../../MsgText';
+import RadioPill from '../../RadioPill';
+import { getUserId } from '../../../services/auth';
 
 const FormUser = () => {
     const navigate = useNavigate(); 
@@ -13,59 +15,116 @@ const FormUser = () => {
         username: "", 
         email: "", 
         password: "", 
-        nome:"",
-        sobrenome: null, 
+        name:"",
+        lastname: "", 
         status: 2, 
-        previlegio: 3,
-        equipe: null,
-        arquivado: 0
+        role: 3,
+        team: "",
+        archived: 0
     };
     const [ msg, setMsg ] = useState({show: false});
     const [ inputs, setInputs ] = useState(initialValues);
     const [ params ] = useSearchParams();
+    const [openMoreTeamOptions , setOpenMoreTeamOptions] = useState(false);
+    const [ teamOptions, setTeamOptions ] = useState([]);
+    const [ registerUser, setRegisterUser ] = useState([]);
 
+    const handleSubmit2 = (e) => {
+        if(validate()){
+            api.post("/users/create", inputs)
+            .then(res => {
+                api.get(`/users/details/${res.data}`).then(res => {
+                    register(getUserId(),1,1,{},res.data)
+                    navigate("/users?msg=1")
+                })     
+            })
+            .catch(err => setMsg({show:true, content:"Campos como Username ou Email já foram cadastrados anteriormente.",style:"warning"}))
+        }   
+    }
     const handleChanges = (e) => {
         const { name, value } = e.target;
         setInputs(values => ({...values,[name]:value}));
     }
+
+    const validate = () => {
+        if(inputs.username === "" || inputs.password === "" 
+        || inputs.email === "" || inputs.name === "") { 
+            setMsg({show: true, content:"Por favor, verifique os campos obrigatórios.", style: "danger"}) 
+            return false;
+        }
+        if(hasUpperCase(inputs.username)) {
+            setMsg({show:true, content:"Username deve conter apenas letras minúsculas e números", style:"warning"})
+            return false;
+        }
+
+        return true;
+    }
     const userFormHandler = (e) => {
         e.preventDefault();
 
-        if(inputs.username === "" || inputs.password === "" 
-        || inputs.email === "" || inputs.nome === "") { 
-            setMsg({show: true, content:"Por favor, verifique os campos obrigatórios.", style: "danger"}) 
-        } else {
-            if(hasUpperCase(inputs.username)) {
-                setMsg({show:true, content:"Username deve conter apenas letras minúsculas e números", style:"warning"})
-            } else {
-                if(params.get('id') !== '0' && params.get('copy') !== '1') {
-                    var updateUser = {
-                        ids: [inputs.id],
-                        columns:[],
-                        user: inputs
+        if(validate()) { 
+            if((params.get('id') !== '0' && params.get('copy') === '0') 
+                || (params.get('id') !== '0' && params.get('copy') !== '0')) {
+                api.post("/users/edit", {
+                    ids: [inputs.id],
+                    columns:[],
+                    user: inputs
+                })
+                .then(res => {
+                    if(params.get('copy') === '0'){                     
+                        navigate(`/users/edit/users-info?id=${params.get('id')}&copy=0`)
+                    } else {
+                        navigate(`/users/edit/users-info?id=${params.get('id')}&copy=${params.get('copy')}`);
                     }
-                    api.post("/users/update", updateUser)
-                    .then(res => navigate("/users?msg=2"))
-                    .catch(err => navigate("/users?msg=4"));
-                } else {
-                    api.post("/users/create", inputs)
-                    .then(res => navigate("/users?msg=1"))
-                    .catch(err => navigate("/users?msg=4"))
-                }
-            }
+                })
+                .catch(err => setMsg({show:true, content:"Campos como Username ou Email já foram cadastrados anteriormente.", style:"warning"}));
+            } else {
+                api.post("/users/create", inputs)
+                .then(res => {
+                    var id = res.data
+                    api.get(`/users/details/${id}`).then(res=>{
+                        register(getUserId(),1,1,{},res.data);
+                        if(params.get('copy') === '0'){
+                            navigate(`/users/edit/users-info?id=${id}&copy=0`)
+                        } else {
+                            navigate(`/users/edit/users-info?id=${id}&copy=${params.get('copy')}`);
+                        }
+                    })
+                })
+                .catch(err => setMsg({show:true, content:"Campos como Username ou Email já foram cadastrados anteriormente.",style:"warning"}))
+            }        
         }  
     }
 
     useEffect(() => {
         
-        if(params.get('id') !== '0') {            
-            var url = `/users/id/${params.get('id')}`;
+        if(params.get('id') !== '0' || params.get('copy') !== '0') {            
+            var url = params.get('id') !== '0' || 
+            params.get('copy') === '0'
+            ? `/users/details/${params.get('id')}`
+            : `/users/details/${params.get('copy')}`;
             api.get(url)
             .then(res => {
                 formatApi(res.data);
                 setInputs(res.data);
+                setRegisterUser(res.data);
+                if(res.data.addressId == '') setInputs(v=>({...v,addressId:0}));
+                if(res.data.documentId == '') setInputs(v=>({...v,documentId:0}));
             })
         }
+
+        api.post('/users/pages', {currentPage:1,maxItems:1,search:"",filters:{
+            status: [1,2],
+            teams: [],
+            date: -1,
+            archived: false,
+            date_range: ['1909-01-01','2100-01-01'],
+            order: ''
+        }}).then((res)=>{
+            const teamOptions = res.data.teamOptions.map(item=>item.team.trim());
+            setTeamOptions(teamOptions);
+            console.log(teamOptions)
+        }).catch(err => console.log(err));
         
     }, [params])
 
@@ -80,16 +139,20 @@ const FormUser = () => {
                     <div className='container'>
                         <div className='panel panel-white'>
 
-                            <div className='panel-header'>                               
-                                <h3 className='panel-title'>Equipe / {params.get("id") > 0 ? 'Editar Usuário' : 'Novo Usuário'}</h3>
-                                <h4  className='panel-subtitle'>Passo 1 de 2</h4>
+                            <div className='panel-header'>   
+                                <div className='panel-title'>
+                                    <Link style={{marginRight:'32px'}} className='transparent' to="/users"><i className='fa fa-arrow-left'></i></Link>
+                                    <h4>Equipe</h4> <h3> / {params.get("id") > 0 ? 'Editar Usuário' : 'Novo Usuário'}</h3>
+                                </div>                            
+                               
+                                
                                     
                                 <MsgText show={msg.show} style={msg.style} content={msg.content}/>
                             </div>
 
 
                             <div className='panel-body'>
-                                <div className='form-custom'>
+                                <div className='form-custom'>                  
                                     <Form
                                     onSubmit={userFormHandler}
                                     method='post'>
@@ -105,10 +168,10 @@ const FormUser = () => {
                                                     <div className='form-input'>
                                                         <label>Nome:</label>
                                                         <input 
-                                                        style={{border: msg.show && inputs.nome === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}} 
+                                                        style={{border: msg.show && inputs.name === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}} 
                                                         onChange={handleChanges} 
-                                                        value={inputs.nome} 
-                                                        name="nome" 
+                                                        value={inputs.name} 
+                                                        name="name" 
                                                         type="text"/>
                                                     </div>    
                                                                                                                                                                
@@ -118,8 +181,8 @@ const FormUser = () => {
                                                         <label>Sobrenome (Opcional):</label>
                                                         <input 
                                                         onChange={handleChanges} 
-                                                        value={inputs.sobrenome} 
-                                                        name="sobrenome" 
+                                                        value={inputs.lastname} 
+                                                        name="lastname" 
                                                         type="text" />
                                                     </div>
                                                                                        
@@ -156,33 +219,72 @@ const FormUser = () => {
                                                         type="email"/>
                                                     </div>                                                                                                          
                                                     </div>
-                                                    <div className='col-2'>                                      
+                                                    <div className='col-2'>      
+                                                        {
+                                                            (params.get('id') === '0' || params.get('copy') === '1') && <div className='form-input'>
+                                                                <label>Senha:</label>
+                                                                <input 
+                                                                style={{border: msg.show && inputs.password === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}}
+                                                                onChange={handleChanges} 
+                                                                value={inputs.password} 
+                                                                name="password" 
+                                                                type="password"/>
+                                                            </div> 
+                                                        }                                
+                                                        
                                                         <div className='form-input'>
-                                                            <label>Senha:</label>
+                                                            <label>Equipe (Opcional):</label>
                                                             <input 
-                                                            style={{border: msg.show && inputs.password === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}}
-                                                            onChange={handleChanges} 
-                                                            value={inputs.password} 
-                                                            name="password" 
-                                                            type="password"/>
-                                                        </div> 
-                                                        <div className='form-input'>
-                                                            <label>Equipe:</label>
-                                                            <input 
-                                                            onChange={handleChanges} 
-                                                            value={inputs.equipe} 
-                                                            name="equipe" 
+                                                            onChange={e => {
+                                                                handleChanges(e);
+                                                                setOpenMoreTeamOptions(false)
+                                                            }} 
+                                                            value={inputs.team} 
+                                                            name="team" 
                                                             type="text"/>
-                                                        </div>                                                                       
-                                                    </div>  
-                                                    
+                                                            <div className='dropdown'>
+                                                                <i onClick={e => setOpenMoreTeamOptions(!openMoreTeamOptions)} className='fa fa-search search-input'></i>
+                                                                {
+                                                                    openMoreTeamOptions && 
+                                                                    <div className='menu radio-hidden'>
+                                                                        <div className='menu-header'>
+                                                                            <h5>Equipes cadastradas</h5>
+                                                                        </div>
+                                                                        
+                                                                    {
+                                                                        teamOptions.map((team,i) => {
+                                                                            if(team != "") return(
+                                                                                <RadioPill
+                                                                                name="team" 
+                                                                                onClick={handleChanges} 
+                                                                                placeholder={team} 
+                                                                                css='info'
+                                                                                value={team}
+                                                                                defaultChecked={inputs.team == team}
+                                                                                />
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        
+                                                            
+                                                        
+                                                            
+                                                        <div>
+                                                    </div>                                                                    
+                                                </div>   
                                             </div>
                                         </div>
                                         
             
                                         <div className='group-button'>
-                                            <button className='btn-custom success' type="submit">Próximo</button>
-                                            <Link className='btn-custom warning' to="/users">Cancelar</Link>
+                                            <Link to="/users" className='btn-custom warning'>Cancelar</Link>
+                                            { params.get('id') === '0' && <button name="later" onClick={handleSubmit2} className='btn-custom info' type="button">Salvar Rascunho</button> }
+                                            <button name="continuar" className='btn-custom success' type="submit">Próximo</button><h4>Passo 1 de 2</h4>
                                         </div>
                                         
                                     </Form>

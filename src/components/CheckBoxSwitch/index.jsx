@@ -1,6 +1,6 @@
 import './CheckBoxSwitch.css';
 
-const CheckBoxSwitch = ({defaultChecked, name}) => {
+const CheckBoxSwitch = ({defaultChecked, name, checked,onClick,value}) => {
   return (
     <>
       <input
@@ -8,6 +8,11 @@ const CheckBoxSwitch = ({defaultChecked, name}) => {
         id={`switch-${name}`}
         type="checkbox"
         defaultChecked={defaultChecked}
+        onChange={()=>{}}
+        checked={checked}  
+        onClick={onClick} 
+        value={value}   
+        name={name}
       />
       <label
         className="switch-label"

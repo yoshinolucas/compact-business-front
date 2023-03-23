@@ -1,0 +1,97 @@
+.sidebar {
+    background-color: var(--header);
+    height: 100%;
+    position:fixed;
+    left:0;
+    top:60px;
+    bottom:0;
+    border-right: 1px solid var(--background);
+    border-top: 1px solid var(--background);
+}
+
+.open-sidebar {
+    width: 250px;
+}
+
+.close-sidebar {
+    width: 90px;
+}
+
+.openbtn-sidebar {
+    position: fixed;
+    top:0;
+    left:0;
+    border-radius:4px;
+    margin: 6px 19px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--panel);
+    border: none;
+    font-size: 20px;
+}
+.openbtn-sidebar:hover {
+    background-color: var(--white02);
+}
+
+.closebtn-sidebar {
+    font-size: 20px;
+}
+
+.sidebar nav ul {
+    list-style: none;
+}
+
+.sidebar nav ul li {
+    height: 60px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color:var(--secondary02);
+    cursor:pointer;
+    text-align: left;
+}
+
+.sidebar nav ul li:hover {
+    background-color: var(--white02);
+}
+
+.sidebar nav ul li a {
+    height: 60px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar nav ul li i {
+    width: 20px;
+    font-size: 18px;
+    margin-left:34px;
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar .markdown-btn {
+    background-color:transparent;
+    height: 30px;
+    width: 3px;
+    transition: all 80ms ease-in-out;
+}
+
+.sidebar nav ul li:hover .markdown-btn {
+    background-color: var(--primary02);
+}
+
+.sidebar nav ul li ul li:hover .markdown-btn {
+    background-color: var(--primary02);
+}
+
+.sidebar nav ul ul{
+    background-color: var(--white02);
+    box-shadow: inset 0 1px 0 rgba(0,0,0,0.1);
+}
+
+.sidebar h5 {
+    margin:24px 12px 0px 28px;
+}

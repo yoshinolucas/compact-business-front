@@ -1,0 +1,26 @@
+.home .cards1,.home .cards2 {
+    margin-bottom: 32px;
+    width: 100%;
+    display: flex;
+    gap: 24px;
+}
+
+.home .cards1 .card,.home .cards2 .card {
+    height: 120px;
+    width: 50%;
+    border-radius: 8px;
+    box-shadow: var(--shadow04);
+    padding:8px;
+}
+
+.home .cards2 .card {
+    height: 280px;
+}
+
+
+
+.home .card .card-header {
+    padding:16px;
+    gap:16px;
+}
+

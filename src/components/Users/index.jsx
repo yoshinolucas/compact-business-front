@@ -1,47 +1,54 @@
 import { useState,useEffect } from "react";
 import './Users.css';
 import api from '../../services/api';
-import Header from "../../includes/Header";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Modal from "../Modal";
-import Footer from "../../includes/Footer";
 import SearchInput from "../SearchInput";
 import MsgText from "../MsgText";
-import { formatApi, STATUS_CADASTRO } from "../../services/config";
+import { formatDate, register, ROLES, STATUS_CADASTRO } from "../../services/config";
 import CheckBoxPill from "../CheckBoxPill";
 import CheckBoxSwitch from "../CheckBoxSwitch";
+import RadioPill from "../RadioPill";
+import RadioPillSwitch from "../RadioPillSwitch";
+import Layout from "../../includes/Layout";
+import { getUserId } from "../../services/auth";
+
 
 const Users = () => {
 
-
-    const maxItems = 15;
-    const[ allSelect, setAllSelect ] = useState([]);
+    const defaultFilters = {
+        status: [1,2],
+        teams: [],
+        date: -1,
+        archived: false,
+        date_range: ['1909-01-01','2100-01-01'],
+        order: ''
+    };
+    const defaultColumnsShow = [false,true, true, true, true, true,false,false,false];
+    const[ rowsSelected, setRowsSelected ] = useState([]);
     const[ params ] = useSearchParams();
     const navigate = useNavigate();
     const[ msg, setMsg ] = useState({show: false, content: "", style: ""});
     const[ users, setUser ] = useState([]);
-    const[ infoRecords, setInfoRecord ] = useState({totalPages: 1, totalRecords: 0,equipeOptions: []});
+    const[ infoRecords, setInfoRecord ] = useState({maxItems: 15, totalPages: 1, totalRecords: 0,teamOptions: []});
     const[ modalRemove, setModalRemove ] = useState(false);
     const[ modalMultiple, setModalMultiple ] = useState(false);
     const[ modalMain, setModalMain] = useState(false);
-    
-
+    const[ openMoreTeamOptions, setOpenMoreTeamOptions ] = useState(false);
     const[ openFilter, setOpenFilter] = useState(false);
-    const[ filters , setFilters] = useState({
-        status: [1,2],
-        equipe: [],
-        arquivado: false
-    });
-
+    const[ filters , setFilters] = useState(defaultFilters);
     const [ openColumn, setOpenColumn ] = useState(false);
     const [ columns, setColumns ] = useState(
-        ['Nome completo','Username','Email','Equipe','Status no Sistema']
+        {
+            header: ['Id','Nome completo','Username','Email','Equipe','Status','Privilégios','Data de cadastro / Admissão', 'Última atualização'],
+            show: defaultColumnsShow
+        }
     )
-
+    const [ openOrder, setOpenOrder ] = useState(false);
     const [ search, setSearch ] = useState("");
     const [ currentPage, setCurrentPage] = useState(1);
-
     const [ pages, setPages ] = useState([1,2,3])
+    const [ multiple, setMultiple ] = useState({team:'',unarchive:false});
 
     const handleSelected = (e) => {
         setMsg({show:false});   
@@ -57,14 +64,14 @@ const Users = () => {
 
         if(user === null && checkbox === null) {
             var rows = document.querySelectorAll("tbody tr");
-            setAllSelect([]); 
+            setRowsSelected([]); 
             var allCheckbox = e.target;
             if(allCheckbox.checked) {                               
                 for(let i = 0; i < rows.length; i++) {
                     rows[i].className = "selected"
                     checkbox = rows[i].children[0].children[0];
                     checkbox.checked = true;              
-                    setAllSelect(values => [...values,rows[i].id]);                   
+                    setRowsSelected(values => [...values,parseFloat(rows[i].id)]);                   
                 }
             } else {
                 for(let i = 0; i < rows.length; i++) {
@@ -77,33 +84,31 @@ const Users = () => {
             if(user.classList.contains('selected')) {
                 checkbox.checked = false;
                 user.className = "";     
-                setAllSelect(values => values.filter(value => value !== user.id))          
+                setRowsSelected(values => values.filter(value => value !== parseFloat(user.id)))          
             } else { 
                 checkbox.checked = true;
                 user.className = "selected";
-                setAllSelect(values => [...values,user.id])
+                setRowsSelected(values => [...values,parseFloat(user.id)])
             }
         }
         
     }
-
     const handleRemove = (e) => {
         setMsg({show:false});       
         setModalRemove(true);
-    }
-    
+    }  
     const handleRemoveConfirm = (e) => {
         e.preventDefault();
-        var json = {ids:allSelect};
-        api.post('/users/remove', json)
+        var json = {ids:rowsSelected};
+        api.post('/users/delete', json)
         .then((res) => {
+            register(getUserId(),1,3,json,{})
             navigate("/users?msg=3");
             window.location.reload(false);
-        }).catch(err => console.log(err))
+        }).catch(err => console.log(err));
     }
-
     const handlePages = (e) => {
-        var max = infoRecords.totalPagesWithSearch > 0 ? infoRecords.totalPagesWithSearch : infoRecords.totalPages;
+        var max = infoRecords.totalPagesWithFilters > 0 ? infoRecords.totalPagesWithFilters : infoRecords.totalPages;
         if(e.target.id === 'previous') {
             if( pages[0] > 1 ) setPages([pages[0] - 1, pages[1] - 1, pages[2] - 1]);
             setCurrentPage(currentPage - 1)
@@ -114,20 +119,35 @@ const Users = () => {
         }
         
     }
-
     const handleOpenFilter = (e) => {
         setMsg({show:false});
         setOpenColumn(false);
+        setOpenOrder(false);
         setOpenFilter(!openFilter);
-    }
-    
+    }   
     const handleOpenColumn = (e) => {
         setMsg({show:false});
         setOpenFilter(false);
+        setOpenOrder(false);
         setOpenColumn(!openColumn);
     }
-
+    const handleOpenOrder = (e) => {
+        setMsg({show:false});
+        setOpenFilter(false);
+        setOpenColumn(false);
+        setOpenOrder(!openOrder);
+    }
+    const handleColumns = (e) => {
+        var value = e.target.value;
+        var newShow = columns.show.slice();
+        
+        var index = columns.header.indexOf(value);
+        newShow[index] = !columns.show[index];
+        setColumns(v => ({...v,show: newShow}))
+           
+    }
     const handleFilter = (e) => {
+        
         var name = e.target.name;
         var value = e.target.value;
 
@@ -138,44 +158,84 @@ const Users = () => {
             else newStatus.push(value);
             setFilters(v => ({...v,[name]: newStatus}))
         }
-
-        if(name === "equipe"){
-            var newEquipe = filters.equipe;
+        if(name === "teams"){
+            var newTeam = filters.teams;
             value = value.trim();
-            if(newEquipe.includes(value)) newEquipe = newEquipe.filter(v => v !== value)
-            else newEquipe.push(value);
-            setFilters(v => ({...v,[name]: newEquipe}))
+            if(newTeam.includes(value)) newTeam = newTeam.filter(v => v !== value)
+            else newTeam.push(value);
+            setFilters(v => ({...v,[name]: newTeam}))
         }
 
-        if(name === "arquivado") {
-            setFilters(v => ({...v,[name]: !filters.arquivado}))
+        if(name === "archived") {
+            setFilters(v => ({...v,[name]: !filters.archived}))
+        }
+
+        if(name === "date") { 
+            setFilters(v => ({...v,date_range: ['1909-01-01','2100-01-01']}))
+            value = parseFloat(value)
+            setFilters(v => ({...v,[name]: value}))
+        }
+
+        if(name.includes("date_range")) {
+            var min = filters.date_range[0];
+            var max = filters.date_range[1];
+            if(name.includes('min')) min = value;
+            if(name.includes('max')) max = value;
+            setFilters(v => ({...v,[name.substr(0,10)]: [min,max]}))
+        }
+
+        if(name === 'order') {
+            setFilters(v => ({...v,order:value}));
         }
     }
-
     const handleArchive = (e) => {
         e.preventDefault();
         var json = {
-            ids:allSelect, 
-            columns: ['arquivado'],
+            ids:rowsSelected, 
+            columns: ['archived'],
             user: {
-                arquivado: 1
+                archived: 1
             }
         };
-        api.post('/users/update', json)
+        api.post('/users/edit', json)
         .then((res) => {
+            register(getUserId(),1,2,{ids:rowsSelected},json.user);
             navigate("/users?msg=2");
             window.location.reload(false);
         }).catch(err => console.log(err))
     }
-
-    const handleMultiple = (e) => {
+    const handleOpenMultiple = (e) => {
         e.preventDefault();
         setMsg({show:false});
         setModalMultiple(true);
     }
-
-    const handleStatusConfirm = (e) => {
+    const handleMultiple = (e) => {
+        var name = e.target.name;
+        var value = e.target.value;
+        if(name==='equipe') {
+            setMultiple(v=>({...v,equipe:value}));
+        } else {
+            setMultiple(v=>({...v,unarchive:!multiple.unarchive}));
+        }
+    }
+    const handleMultipleConfirm = (e) => {
         e.preventDefault();
+        var columnsMultiple = ['team']
+        if(multiple.unarchive) columnsMultiple.push('archived');
+        var json = {
+            ids:rowsSelected, 
+            columns: columnsMultiple,
+            user:{
+                team: multiple.team,
+                archived:0
+            }
+        };    
+        api.post('/users/edit', json)
+        .then((res) => {
+            register(getUserId(),1,2,{ids:rowsSelected},json.user);
+            navigate("/users?msg=2");
+            window.location.reload(false);
+        }).catch(err => console.log(err))
     }
 
     useEffect(() => {
@@ -184,523 +244,691 @@ const Users = () => {
         if(params.get("msg") === '3') setMsg({show:true, content: "Usuário(s) excluído(s) com sucesso.", style: "success"});
         if(params.get("msg") === '4') setMsg({show:true, content: "Erro no servidor. Tente novamente mais tarde.", style: "danger"});
         params.delete("msg");
-        var data = {
-            "maxItems" : maxItems,
-            "currentPage" : currentPage > infoRecords.totalPagesWithSearch ? 1 : currentPage,
-            "search" : search,
-            "filters": filters,
-        };
-
-        console.log(data)
-        api.post('/users/table', data)
-        .then((res)=>{
-            setInfoRecord(
-                {
+        var data ={
+            maxItems : infoRecords.maxItems,
+            currentPage : currentPage > infoRecords.totalPagesWithFilters ? 1 : currentPage,
+            search : search,
+            filters: filters,
+        }
+        api.post('/users/pages', data).then((res)=>{
+            const teamOptions = res.data.teamOptions.map(item=>item.team.trim());
+            setInfoRecord(v=>
+                ({  ...v,
                     totalPages: res.data.totalPages,
                     totalRecords: res.data.totalRecords,
-                    totalPagesWithSearch: res.data.totalPagesWithSearch,
-                    totalRecordsWithSearch: res.data.totalRecordsWithSearch,
-                    equipeOptions: res.data.equipeOptions
-                });
-            
+                    totalPagesWithFilters: res.data.totalPagesWithFilters,
+                    totalRecordsWithFilters: res.data.totalRecordsWithFilters,
+                    teamOptions: teamOptions,
+                    currentPageLength:res.data.currentPageLength
+                }));
+
             setUser(res.data.users)
         }).catch(err => console.log(err));
-
-    },[params,filters,search, currentPage,infoRecords.totalPagesWithSearch]);
+    },[multiple,params,filters,search, currentPage,infoRecords.totalPagesWithFilters]);
 
     return(
         <>
-            <Header />
-            <main>
-                <div className="users">
-                    
-                        <div className="container">
-                            <div className="panel">   
+        <Layout hasSidebar={true} background={'var(--panel)'}>
+        
+        <div className="panel-header">
+            <div className="panel-header-wrapper">
+                <div className="panel-title">
+                <Link to="/home"><h4><u>Início</u></h4></Link> <h4>&nbsp;&nbsp;&gt;&nbsp; </h4> <h3> Equipe</h3>
+                </div>
+                
 
+                <div className="group-button">
+                    <Link to="/users/edit?id=0&copy=0" className="btn-custom success btn-medium btn-pill"><i className="fa-solid fa-add"></i>Novo</Link>
+                </div>
+            </div>
+            <MsgText show={msg.show} style={msg.style} content={msg.content}/>
+            
+            <div className="hr"></div>
+        </div>
 
-                                <div className="panel-header">
-                                    <div className="panel-header-wrapper">
-                                        <h3 className="panel-title">Home / Equipe</h3>
+        <div className="panel-body">
+                <div className="section">    
 
-                                        <div className="group-button">
-                                            <Link to="/users/edit?id=0" className="btn-custom success btn-medium btn-pill"><i className="fa-solid fa-add"></i>Novo</Link>
-                                        </div>
-                                    </div>
-                                    <MsgText show={msg.show} style={msg.style} content={msg.content}/>
-                                    
-                                    <div className="hr"></div>
-                                </div>
+                    <div className="section-header">
+                        <h4 className="section-title">Ferramentas</h4>
+                    </div>  
+                    <div className="section-body">
+                        <div className="section-wrapper" style={{display:'flex', justifyContent:'space-between'}}>
+                            <div className="group-button">
+                                <Link to={`/users/edit?id=0&copy=${rowsSelected[0]}`} className={document.querySelectorAll(".selected").length === 1 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-copy"></i>Duplicar</Link>
+                                <button onClick={handleArchive} className={rowsSelected.length > 0 ? "btn-custom btn-medium info" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-inbox"></i>Arquivar</button>
+                                <button onClick={handleOpenMultiple}  className={rowsSelected.length > 0 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-edit"></i>Alterar dados</button>                                                     
+                            </div>      
+                            <div className="group-button">
+                                <button className={rowsSelected.length > 0 ? "btn-custom btn-medium danger" : "btn-custom btn-border btn-medium disabled-border"} onClick={handleRemove}><i className="fa-solid fa-trash"></i>Excluir</button>
+                            </div>                                              
+                        </div>
+                                                                        
+                    </div>                                                                                                                               
+                </div>                
+                <div className="table-custom">
 
-                                <div className="panel-body">
-                                        <div 
-                                        className="group-button"
-                                        style={{justifyContent: 'flex-end', marginBottom: '16px'}}
-                                        >
-                                            <h5>Exportar</h5>
-                                            <button className="btn-custom btn-border btn-pill warning-border"><i className="fa fa-file"></i>PDF</button>
-                                            <button className="btn-custom btn-border btn-pill success-border"><i className="fa fa-file"></i>Excel</button>
-                                        </div>
-                                        <div className="section">    
-
-                                            <div className="section-header">
-                                                <h4 className="section-title">Ferramentas</h4>
-                                            </div>  
-                                            <div className="section-body">
-                                                <div className="section-wrapper" style={{display:'flex', justifyContent:'space-between'}}>
-                                                    <div className="group-button">
-                                                        <Link to={`/users/edit?id=${allSelect[0]}&copy=1`} className={document.querySelectorAll(".selected").length === 1 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-copy"></i>Duplicar</Link>
-                                                        <button onClick={handleArchive} className={allSelect.length > 0 ? "btn-custom btn-medium info" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-inbox"></i>Arquivar</button>
-                                                        <button onClick={handleMultiple}  className={allSelect.length > 0 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-edit"></i>Alterar dados</button>
-                                                        
-                                                    </div>      
-                                                    <div className="group-button">
-                                                        <button className={allSelect.length > 0 ? "btn-custom btn-medium danger" : "btn-custom btn-border btn-medium disabled-border"} onClick={handleRemove}><i className="fa-solid fa-trash"></i>Excluir</button>
-                                                        <button onClick={e => setModalMain(e)} className="btn-custom danger">Main</button>
-                                                    </div>                                              
+                    <div className="table-custom-info">
+                        <h4>{rowsSelected.length > 0 ? rowsSelected.length : 0} Selecionado(s)</h4>                                             
+                        <div className="table-custom-info-wrapper">
+                            <SearchInput 
+                            search={search} 
+                            setSearch={setSearch}
+                            setCurrentPage={setCurrentPage}
+                            setPages={setPages}
+                            handleSelected={handleSelected}
+                            />
+                            <div className="group-button">   
+                                <div className="dropdown">
+                                    <button 
+                                    className="btn-custom btn-border table-custom-info-button" 
+                                    onClick={handleOpenFilter}><i className="fa-solid fa-filter"></i> 
+                                    Filtros
+                                    </button>
+                                    {
+                                        openFilter && 
+                                        <div className="menu filters">
+                                            <div className="menu-wrapper">
+                                                <div className="menu-header">
+                                                    <button onClick={e => setOpenFilter(false)} className="transparent"><i className="fa fa-arrow-left"></i></button>
+                                                    <button onClick={e => {
+                                                        setFilters(defaultFilters);
+                                                        setOpenFilter(false);
+                                                    }} className="btn-custom btn-pill btn-border">Redefinir</button>
                                                 </div>
-                                                                                              
-                                            </div>                                                                                                                               
-                                        </div>                
-                                        <div className="table-custom">
+                                                <div className="menu-body">
 
-                                            <div className="table-custom-info">
-                                               
+                                                    <h5>Filtros predefinidos</h5>
+                                                    <div className="group-button">
+                                                        <CheckBoxPill 
+                                                        defaultChecked={filters.status.includes(1)} 
+                                                        onClick={handleFilter} 
+                                                        name="status" 
+                                                        value={1} 
+                                                        placeholder="Cadastro completo" 
+                                                        css="success" 
+                                                        size="long"
+                                                        />
+                                                                                    
+                                                        <CheckBoxPill 
+                                                        defaultChecked={filters.status.includes(2)}
+                                                        value={2} 
+                                                        onClick={handleFilter} 
+                                                        name="status" 
+                                                        placeholder="Pendentes" css="warning" 
+                                                        size="medium"/>
+                                                    </div>
 
-                                                <h4>{allSelect.length > 0 ? allSelect.length : 0} Selecionado(s)</h4>
-                                                
-                                                                                               
-                                                <div className="table-custom-info-wrapper">
-                                                    <SearchInput 
-                                                    search={search} 
-                                                    setSearch={setSearch}
-                                                    setCurrentPage={setCurrentPage}
-                                                    setPages={setPages}
-                                                    handleSelected={handleSelected}
-                                                    />
-                                                    <div className="group-button">   
-                                                        <div className="dropdown">
-                                                        <button 
-                                                        className="btn-custom btn-border table-custom-info-button" 
-                                                        onClick={handleOpenFilter}><i className="fa-solid fa-filter"></i> 
-                                                        Filtros
-                                                        </button>
-                                                        {
-                                                            openFilter && 
-                                                            <div className="menu filters">
-                                                                <div className="menu-wrapper">
-                                                                    <div className="menu-header">
-                                                                        <button onClick={e => setOpenFilter(false)} className="transparent"><i className="fa fa-arrow-left"></i></button>
-                                                                        <button className="btn-custom btn-pill btn-border">Redefinir</button>
-                                                                    </div>
+                                                    <h5>Outros filtros</h5>
+                                                    <div className="group-button">
+                                                        <CheckBoxPill 
+                                                        defaultChecked={filters.status.includes(4)}
+                                                        onClick={handleFilter} 
+                                                        name="status" 
+                                                        value={3} 
+                                                        placeholder="Inativos" 
+                                                        css="danger"
+                                                        size="medium"/>
+                                                        <CheckBoxPill 
+                                                        defaultChecked={filters.archived === true}
+                                                        onClick={handleFilter} 
+                                                        name="archived"
+                                                        value={true} 
+                                                        placeholder="Arquivados" 
+                                                        css="info" 
+                                                        />
+                                                    </div>
 
+                                                    <h5>Equipes</h5>
+                                                    <div className="group-button">
+                                                        <CheckBoxPill          
+                                                        checked={filters.teams.length > 0 ? false : true}
+                                                        placeholder="Qualquer equipe"
+                                                        css="info"
+                                                        size="long"/>
+                                                    </div>
 
-                                                                    <div className="menu-body">
-
-                                                                        <h5>Filtros predefinidos</h5>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            defaultChecked={filters.status.includes(1)} 
-                                                                            onClick={handleFilter} 
-                                                                            name="status" 
-                                                                            value={1} 
-                                                                            placeholder="Cadastro completo" 
-                                                                            css="success" 
-                                                                            size="long"
-                                                                            />
-                                                                                                        
-                                                                            <CheckBoxPill 
-                                                                            defaultChecked={filters.status.includes(2)}
-                                                                            value={2} 
-                                                                            onClick={handleFilter} 
-                                                                            name="status" 
-                                                                            placeholder="Pendentes" css="warning" 
-                                                                            size="medium"/>
-                                                                        </div>
-
-                                                                        <h5>Outros filtros</h5>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            defaultChecked={filters.status.includes(4)}
-                                                                            onClick={handleFilter} 
-                                                                            name="status" 
-                                                                            value={4} 
-                                                                            placeholder="Inativos" 
-                                                                            css="danger"
-                                                                            size="medium"/>
-                                                                            <CheckBoxPill 
-                                                                            defaultChecked={filters.arquivado === true}
-                                                                            onClick={handleFilter} 
-                                                                            name="arquivado"
-                                                                            value={true} 
-                                                                            placeholder="Arquivados" 
-                                                                            css="info" 
-                                                                            />
-                                                                        </div>
-
-                                                                        <h5>Equipe</h5>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill          
-                                                                            checked={filters.equipe.length > 0 ? false : true}
-                                                                            placeholder="Qualquer equipe"
-                                                                            css="info"
-                                                                            size="long"/>
-                                                                        </div>
-
-                                                                        {
-                                                                            infoRecords.equipeOptions.map((equipe, i) => {
-                                                                                return (
-                                                                                    <div key={`equipe-${i}`} className="group-button">
-                                                                                        <CheckBoxPill 
-                                                                                        defaultChecked={filters.equipe.includes(equipe.equipe ? equipe.equipe.trim() : "Indefinido")}
-                                                                                        onClick={handleFilter} 
-                                                                                        name="equipe" 
-                                                                                        value={equipe.equipe ? equipe.equipe : "Indefinido"}
-                                                                                        placeholder={equipe.equipe ? equipe.equipe : "Indefinido"} 
-                                                                                        css={equipe.equipe ? "success" : "neutral"}
-                                                                                        size="long"/>
-                                                                                    </div>
-                                                                                )
-                                                                            })
-                                                                            
-                                                                        }
-
-                                                                        <h5>Data de cadastro</h5>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            placeholder="Qualquer data" 
-                                                                            css="success"/>
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Hoje" 
-                                                                            css="info" 
-                                                                            />
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Ontem" 
-                                                                            css="info" 
-                                                                            />
-                                                                            
-                                                                        </div>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Esta semana" 
-                                                                            css="info" 
-                                                                            />
-                                                                            <CheckBoxPill                                                                  
-                                                                            onClick={handleFilter} 
-                                                                            name="status" 
-                                                                            placeholder="Últimos 30 dias" 
-                                                                            css="info"/>
-                                                                            
-                                                                        </div>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Últimos 90 dias" 
-                                                                            css="info" 
-                                                                            />
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Últimos 180 dias" 
-                                                                            css="info" 
-                                                                            />
-                                                                        
-                                                                        </div>
-                                                                        <div className="group-button">
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Há 1 ano" 
-                                                                            css="info" 
-                                                                            />
-                                                                            <CheckBoxPill 
-                                                                            onClick={handleFilter} 
-                                                                            name="90" 
-                                                                            placeholder="Últimos 3 anos" 
-                                                                            css="info" 
-                                                                            />
-                                                                        </div>
-
-                                                                        
-
-
-                                                                        
-
-                                                                        
-                                                                        
-                                                                    </div>
-                                                                        <div className="group-button">
-                                                                            <button className="btn-custom btn-long">Editar filtros</button>
-                                                                            <button className="btn-custom btn-border btn-long">Data customizada</button>
-                                                                        </div>
-                                                                        
-
-                                                                    
-
-                                                                    
-                                                                </div>
-                                                                
-                                                            </div>
-
-                                                        }
-                                                        </div>
-                                                        <div className="dropdown">
-                                                            <button 
-                                                            className="btn-custom btn-border table-custom-info-button"
-                                                            onClick={handleOpenColumn}
-                                                            ><i className="fa-solid fa-table-columns"></i> Colunas</button>                                                          
-                                                            { openColumn &&
-                                                                <div className="menu cols-menu">
-                                                                    <div className="menu-wrapper">
-                                                                        <div className="menu-header">
-                                                                            <button onClick={e => setOpenColumn(false)} className="transparent"><i className="fa fa-arrow-left"></i></button>
-                                                                            <button className="btn-custom btn-pill btn-border">Redefinir</button>
-                                                                        </div>
-                                                                        <div className="menu-body">
-                                                                            <h5>Colunas predefinidas</h5>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch name="nome" defaultChecked={true} />
-                                                                                <label>Nome</label>
-                                                                            </div>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch name="sobrenome" defaultChecked={true} />
-                                                                                <label>Sobrenome</label>
-                                                                            </div>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch name="username" defaultChecked={true} />
-                                                                                <label>Username</label>
-                                                                            </div>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch name="email" defaultChecked={true} />
-                                                                                <label>Email</label>
-                                                                            </div>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch name="status" defaultChecked={true} />
-                                                                                <label>Status no Sistema</label>
-                                                                            </div>
-                                                                            <h5>Outras colunas</h5>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch />
-                                                                                <label>Privilégios</label>
-                                                                            </div>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch />
-                                                                                <label>Data de cadastro / admissão</label>
-                                                                            </div>
-                                                                            <div className="group-button">
-                                                                                <CheckBoxSwitch />
-                                                                                <label>Última atualização</label>
-                                                                            </div>
-                                                                        
-
-                                                                        </div>
-
-                                                                    </div>
-                                                                    
-
-                                                                </div>
+                                                    <div className="group-button">
+                                                    {
+                                                        ((() => {
+                                                            var options = [];                                                                                    
+                                                            for( var i = 0; i < 2; i++ ){
+                                                                var team = infoRecords.teamOptions[i]
+                                                                if(team !== undefined) {
+                                                                    options.push(
+                                                                        <CheckBoxPill 
+                                                                        key={i}
+                                                                        placeholder={team !== "" ? team : "Indefinido"}
+                                                                        css="info"
+                                                                        size="medium"
+                                                                        value={team}
+                                                                        onClick={handleFilter}
+                                                                        defaultChecked={filters.teams.includes(team)}
+                                                                        name="teams"
+                                                                        />
+                                                                    )
+                                                                }
+                                                            }
+                                                            
+                                                            return options
+                                                        })())
+                                                    }
+                                                    </div>
+                                                    <div className="group-button">
+                                                    {
+                                                        ((() => {
+                                                            var options = [];                                                                                    
+                                                            for( var i = 2; i < 4; i++ ){
+                                                                var team = infoRecords.teamOptions[i]
+                                                                if(team != undefined) {
+                                                                    options.push(
+                                                                        <CheckBoxPill 
+                                                                        key={i}
+                                                                        placeholder={team !== "" ? team : "Indefinido"}
+                                                                        css="info"
+                                                                        size="medium"
+                                                                        value={team}
+                                                                        onClick={handleFilter}
+                                                                        defaultChecked={filters.teams.includes(team)}
+                                                                        name="team"
+                                                                        />
+                                                                    )
+                                                                }
+                                                            }
+                                                            
+                                                            return options
+                                                        })())
+                                                    }
+                                                    </div>
+                                                    <button
+                                                    className="btn-custom btn-long btn-border btn-pill"
+                                                    onClick={e => setOpenMoreTeamOptions(!openMoreTeamOptions)}
+                                                    >Mais equipes</button>
+                                                    {
+                                                            openMoreTeamOptions && 
+                                                            <div className="select-custom select-multiple">
+                                                            {
+                                                                infoRecords.teamOptions.map((team, i) => {
+                                                                    if(i > 3) return (
+                                                                        <CheckBoxPill 
+                                                                        key={i}
+                                                                        defaultChecked={filters.teams.includes(team)}
+                                                                        css="info"
+                                                                        value={team} 
+                                                                        onClick={handleFilter}
+                                                                        name="team"
+                                                                        placeholder={team !== "" ? team : "Indefinido"}
+                                                                        />
+                                                                    )
+                                                                })
                                                             }
                                                         </div>
-                                                        
-                                                        
+                                                    }
+                                                    
 
-                                                        <button className="btn-custom btn-border table-custom-info-button"><i className="fa-solid fa-arrow-down-wide-short"></i> Ordem</button>
+                                                    <h5>Data de cadastro</h5>
+                                                    <div className="group-button">
+                                                        <RadioPill
+                                                        onClick={handleFilter} 
+                                                        name="date"
+                                                        value={-1}
+                                                        css="neutral"   
+                                                        placeholder="Qualquer data"  
+                                                        defaultChecked={filters.date === -1}                                                                  
+                                                        />
+                                                        <RadioPill 
+                                                        onClick={handleFilter} 
+                                                        name="date"
+                                                        value={0} 
+                                                        placeholder="Hoje" 
+                                                        css="info" 
+                                                        defaultChecked={filters.date === 0} 
+                                                        />
+                                                        <RadioPill 
+                                                        onClick={handleFilter} 
+                                                        name="date"
+                                                        value={1} 
+                                                        placeholder="Ontem" 
+                                                        css="info" 
+                                                        defaultChecked={filters.date === 1} 
+                                                        />
+                                                        
+                                                    </div>
+                                                    <div className="group-button">
+                                                        <RadioPill 
+                                                        onClick={handleFilter} 
+                                                        name="date"
+                                                        value={7}                      
+                                                        placeholder="Esta semana" 
+                                                        css="info" 
+                                                        defaultChecked={filters.date === 7} 
+                                                        />
+                                                        <RadioPill                                                                  
+                                                        onClick={handleFilter} 
+                                                        name="date" 
+                                                        value={30}
+                                                        placeholder="Últimos 30 dias" 
+                                                        css="info"
+                                                        defaultChecked={filters.date === 30} 
+                                                        />
+                                                        
+                                                    </div>
+                                                    <div className="group-button">
+                                                        <RadioPill 
+                                                        onClick={handleFilter} 
+                                                        name="date" 
+                                                        value={90}
+                                                        placeholder="Últimos 90 dias" 
+                                                        css="info" 
+                                                        defaultChecked={filters.date === 90} 
+                                                        />
+                                                        <RadioPill 
+                                                        onClick={handleFilter} 
+                                                        name="date"
+                                                        value={180}
+                                                        placeholder="Últimos 180 dias" 
+                                                        css="info" 
+                                                        defaultChecked={filters.date === 180} 
+                                                        />
+                                                    
+                                                    </div>
+                                                    <div className="group-button">
+                                                        <RadioPill 
+                                                        onClick={handleFilter} 
+                                                        name="date"
+                                                        value={360} 
+                                                        placeholder="Há 1 ano" 
+                                                        css="info" 
+                                                        defaultChecked={filters.date === 360} 
+                                                        />
+                                                        <RadioPill 
+                                                        onClick={handleFilter} 
+                                                        name="date" 
+                                                        value={1080}
+                                                        placeholder="Últimos 3 anos" 
+                                                        css="info" 
+                                                        defaultChecked={filters.date === 1080} 
+                                                        />
+                                                    </div>
+                                                    <RadioPill 
+                                                        placeholder={"Data customizada"}
+                                                        name="date"
+                                                        css="warning"
+                                                        value={-2}
+                                                        onClick={handleFilter}
+                                                        defaultChecked={filters.date === -2}
+                                                    />
+                                                    {
+                                                        <div className={`form-input ${filters.date === -2 ? "wrapper-content" : "hidden"}`}>
+                                                            <input onBlur={handleFilter} name="date_range_min" type="date"/>
+                                                            <label>Até</label>
+                                                            <input onBlur={handleFilter} name="date_range_max" type="date"/>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+
+                                    }
+                                </div>
+                                <div className="dropdown">
+                                    <button 
+                                    className="btn-custom btn-border table-custom-info-button"
+                                    onClick={handleOpenColumn}
+                                    ><i className="fa-solid fa-table-columns"></i> Colunas</button>                                                          
+                                    { 
+                                        openColumn &&
+                                            <div className="menu cols-menu">
+                                                <div className="menu-wrapper">
+                                                    <div className="menu-header">
+                                                        <button onClick={e => setOpenColumn(false)} className="transparent"><i className="fa fa-arrow-left"></i></button>
+                                                        <button onClick={e=> {
+                                                            setColumns(v=>({...v,show: defaultColumnsShow}));
+                                                            setOpenColumn(false)
+                                                        }
+                                                        } className="btn-custom btn-pill btn-border">Redefinir</button>
+                                                    </div>
+                                                    <div className="menu-body">
+                                                        <h5>Colunas predefinidas</h5>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="nome-competo" 
+                                                            defaultChecked={columns.show[1]} 
+                                                            value={"Nome completo"}
+                                                            onClick={handleColumns}
+                                                            />
+                                                            <label>Nome completo</label>
+                                                        </div>                   
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="username" 
+                                                            defaultChecked={columns.show[2]} 
+                                                            value={"Username"}
+                                                            onClick={handleColumns}
+                                                            />
+                                                            <label>Username</label>
+                                                        </div>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="Email" 
+                                                            defaultChecked={columns.show[3]} 
+                                                            value={"Email"}
+                                                            onClick={handleColumns}
+                                                            />
+                                                            <label>Email</label>
+                                                        </div>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="Equipe" 
+                                                            defaultChecked={columns.show[4]} 
+                                                            value={"Equipe"}
+                                                            onClick={handleColumns}
+                                                            />
+                                                            <label>Equipe</label>
+                                                        </div>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="Status" 
+                                                            defaultChecked={columns.show[5]} 
+                                                            value={"Status"}
+                                                            onClick={handleColumns}
+                                                            />
+                                                            <label>Status</label>
+                                                        </div>
+                                                        <h5>Outras colunas</h5>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="Id"
+                                                            defaultChecked={columns.show[0]}
+                                                            value={'Id'}
+                                                            onClick={handleColumns}/>
+                                                            <label>Id</label>
+                                                        </div>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="Privilegios"
+                                                            defaultChecked={columns.show[6]}
+                                                            value={'Privilégios'}
+                                                            onClick={handleColumns}/>
+                                                            <label>Privilégios</label>
+                                                        </div>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="created_at"
+                                                            defaultChecked={columns.show[7]}
+                                                            value={'Data de cadastro / Admissão'}
+                                                            onClick={handleColumns}/>
+                                                            <label>Data de cadastro / admissão</label>
+                                                        </div>
+                                                        <div className="group-button">
+                                                            <CheckBoxSwitch 
+                                                            name="updated_at"
+                                                            defaultChecked={columns.show[8]}
+                                                            value={'Última atualização'}
+                                                            onClick={handleColumns}/>
+                                                            <label>Última atualização</label>
+                                                        </div>
+                                                    
+
+                                                    </div>
+
+                                                </div>
+                                                
+
+                                            </div>
+                                    }
+                                </div>                                       
+                                <div>
+                                    <button onClick={handleOpenOrder} className="btn-custom btn-border table-custom-info-button"><i className="fa-solid fa-arrow-down-wide-short"></i> Ordem</button>
+                                    { openOrder &&
+                                        <div className="menu order-menu">
+                                            <div className="menu-wrapper">
+                                                <div className="menu-header">
+                                                    <button onClick={e => setOpenOrder(false)} className="transparent"><i className="fa fa-arrow-left"></i></button>
+                                                    <button onClick={e=> {
+                                                        setFilters(v=>({...v,order: ''}));
+                                                        setOpenOrder(false)
+                                                    }
+                                                    } className="btn-custom btn-pill btn-border">Redefinir</button>
+                                                </div>
+                                                <div className="menu-body">
+                                                    <h5>Ordenar por</h5>
+                                                    <div className="group-button">
+                                                        <RadioPillSwitch
+                                                        name="order" 
+                                                        defaultChecked={filters.order === ''} 
+                                                        value={""}
+                                                        onClick={handleFilter}
+                                                        />
+                                                        <label>Id</label>
+                                                    </div> 
+                                                    <div className="group-button">
+                                                        <RadioPillSwitch
+                                                        name="order" 
+                                                        defaultChecked={filters.order === 'name'} 
+                                                        value={"name"}
+                                                        onClick={handleFilter}
+                                                        />
+                                                        <label>Nome (A-Z)</label>
+                                                    </div>                   
+                                                    <div className="group-button">
+                                                        <RadioPillSwitch 
+                                                        name="order" 
+                                                        defaultChecked={filters.order === 'name-desc'} 
+                                                        value={"name-desc"}
+                                                        onClick={handleFilter}
+                                                        />
+                                                        <label>Nome (Z-A)</label>
+                                                    </div>
+                                                    <div className="group-button">
+                                                        <RadioPillSwitch 
+                                                        name="order" 
+                                                        defaultChecked={filters.order === 'created_at'} 
+                                                        value={"created_at"}
+                                                        onClick={handleFilter}
+                                                        />
+                                                        <label>Mais antigo</label>
+                                                    </div>
+                                                    <div className="group-button">
+                                                        <RadioPillSwitch 
+                                                        name="order" 
+                                                        defaultChecked={filters.order === 'created_at-desc'} 
+                                                        value={"created_at-desc"}
+                                                        onClick={handleFilter}
+                                                        />
+                                                        <label>Mais novo</label>
                                                     </div>
                                                 </div>
-                                                
                                             </div>
 
-                                            <table className="table-custom-01">
-                                                <thead>
-                                                    <tr>
-                                                        <th id="user_all"><input 
-                                                        onChange={() => {}} 
-                                                        checked={
-                                                            
-                                                            allSelect.length === maxItems ||
-                                                            allSelect.length === infoRecords.totalRecords ||
-                                                            allSelect.length === infoRecords.totalRecordsWithSearch
-                                                            ? true : false
-                                                        
-                                                            } 
-                                                        type="checkbox" 
-                                                        onClick={handleSelected}
-                                                        /></th>
-                                                        {
-                                                            columns.map((column, i) => {
-                                                                return(
-                                                                    <th key={`column-${i}`}>{column}</th>
-                                                                )
-                                                            })
-                                                        }
-                                                        
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {users.map((user, i) => {
-                                                        return(
-                                                            <tr onClick={e => navigate(`/users/edit?id=${e.target.parentElement.id}`)} key={`user-${i}`} id={user.id}>
-                                                                <td onClick={e => { e.stopPropagation(); handleSelected(e) }}><input type="checkbox" /></td>
-                                                                <td>{`${user.nome} ${user.sobrenome}`}</td>
-                                                                <td>{user.username}</td>
-                                                                <td>{user.email}</td>
-                                                                <td>{user.equipe ? user.equipe : "Indefinido"}</td>
-                                                                <td onClick={e=>e.stopPropagation(e)}>{STATUS_CADASTRO[user.arquivado === 1 ? 99 : user.status]}</td>
-                                                            </tr>
-                                                        );
-                                                    })}                                         
-                                                </tbody>
-                                            </table>
-
-                                            <div className="table-custom-footer">
-                                                <h5>Total de {infoRecords.totalRecords} registros</h5>
-                                            
-                                                <div className="pages">
-                                                    
-                                                    {                                
-                                                        (() => {
-                                                            var a = [];
-
-                                                            var max = infoRecords.totalPagesWithSearch > 0 ? infoRecords.totalPagesWithSearch : infoRecords.totalPages;
-                                                            var len = max >= 3 ? 3 : max;
-                                                        
-                                                            if(currentPage !== 1) {    
-                                                                a.push(
-                                                                    <button
-                                                                    className="btn-custom first"
-                                                                    onClick={(e) => {
-                                                                        handleSelected(e);
-                                                                        setCurrentPage(1);
-                                                                        setPages([1,2,3]);
-                                                                    }}
-                                                                    >
-                                                                    Primeiro
-                                                                    </button>
-                                                                );                                                                              
-                                                                a.push(
-                                                                    <button
-                                                                    id='previous'
-                                                                    className="btn-custom"
-                                                                    onClick={(e) => handlePages(e)}
-                                                                    >
-                                                                    <i id='previous' className="fa fa-angle-left"></i>
-                                                                    </button>);
-                                                            }
-                                                                
-                                                            
-                                                            for( var i = 1; i <= len; i++ ) {
-
-                                                                a.push(
-                                                                <button key={pages[i - 1]} 
-                                                                id={pages[i - 1]} 
-                                                                className={currentPage === pages[i - 1] ? "btn-custom current-page" : "btn-custom"} 
-                                                                onClick={e => {setCurrentPage(parseFloat(e.target.id)); handleSelected(e)}}
-                                                                >
-                                                                {pages[i - 1]}
-                                                                </button>);
-                                                            }
-
-                                                            if(currentPage < max) {
-                                                                a.push(
-                                                                    <button
-                                                                    id='next'
-                                                                    className="btn-custom"
-                                                                    onClick={(e) => handlePages(e)}
-                                                                    >
-                                                                    <i id='next' className="fa fa-angle-right"></i>
-                                                                    </button>
-                                                                );       
-                                                                a.push(
-                                                                    <button
-                                                                    className="btn-custom last"
-                                                                    onClick={(e) => {
-                                                                        handleSelected(e)
-                                                                        setCurrentPage(max);
-                                                                        if(max > 2) {                                                             
-                                                                            setPages([max-2,max-1,max]);
-                                                                        } else {
-                                                                            setPages([1,2])
-                                                                        }
-                                                                    }}
-                                                                    >
-                                                                    Último
-                                                                    </button>
-                                                                );                                                 
-                                                            }
-                                                            return a;
-                                                        })()}
-                                                </div>
-                                            </div>
-                                            
-                                        </div>                   
+                                        </div>
+                                    }       
                                 </div>
+                                
                             </div>
                         </div>
+                        
+                    </div>
+
+                    <table className="table-custom-01">
+                        <thead>
+                            <tr>
+                                <th id="user_all"><input 
+                                onChange={() => {}} 
+                                checked={rowsSelected.length === infoRecords.currentPageLength ? true : false} 
+                                type="checkbox" 
+                                onClick={handleSelected}
+                                /></th>
+                                {columns.show.map((column,i) => <th key={`showColumn-${i}`} className={columns.show[i] ? "" : "hidden"}>{columns.header[i]}</th>)}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map((user, i) => {
+                                return(
+                                    <tr onClick={e => navigate(`/users/edit?id=${e.target.parentElement.id}&copy=0`)} key={`user-${i}`} id={user.id}>
+                                        <td onClick={e => { e.stopPropagation(); handleSelected(e) }}><input type="checkbox" /></td>
+                                        <td className={columns.show[0] ? "" : "hidden"}>{user.id}</td>
+                                        <td className={columns.show[1] ? "" : "hidden"}>{`${user.name} ${user.lastname ?? ""}`}</td>
+                                        <td className={columns.show[2] ? "" : "hidden"}>{user.username}</td>
+                                        <td className={columns.show[3] ? "" : "hidden"}>{user.email}</td>
+                                        <td className={columns.show[4] ? "" : "hidden"}>{user.team ? user.team : "Indefinido"}</td>
+                                        <td className={columns.show[5] ? "" : "hidden"} onClick={e=>e.stopPropagation(e)}>{STATUS_CADASTRO[user.archived === 1 ? 99 : user.status]}</td>
+                                        <td className={columns.show[6] ? "" : "hidden"}>{ROLES[user.role] ?? ROLES[4]}</td>
+                                        <td className={columns.show[7] ? "" : "hidden"}>{formatDate(user.created_at)}</td>
+                                        <td className={columns.show[8] ? "" : "hidden"}>{formatDate(user.updated_at)}</td>
+                                    </tr>
+                                );
+                            })}                                         
+                        </tbody>
+                    </table>
+
+                    <div className="table-custom-footer">
+                        <h5>Total de {infoRecords.totalRecords} registros</h5>
+                        
+                        <div className="pages">
+                            
+                            {                                
+                                (() => {
+                                    var a = [];
+
+                                    var max = infoRecords.totalPagesWithFilters > 0 ? infoRecords.totalPagesWithFilters : infoRecords.totalPages;
+                                    var len = max >= 3 ? 3 : max;
+                                
+                                    if(currentPage !== 1) {    
+                                        a.push(
+                                            <button
+                                            key={-1}
+                                            className="btn-custom first"
+                                            onClick={(e) => {
+                                                handleSelected(e);
+                                                setCurrentPage(1);
+                                                setPages([1,2,3]);
+                                            }}
+                                            >
+                                            Primeiro
+                                            </button>
+                                        );                                                                              
+                                        a.push(
+                                            <button
+                                            key={-2}
+                                            id='previous'
+                                            className="btn-custom"
+                                            onClick={(e) => handlePages(e)}
+                                            >
+                                            <i id='previous' className="fa fa-angle-left"></i>
+                                            </button>);
+                                    }
+                                        
+                                    
+                                    for( var i = 1; i <= len; i++ ) {
+
+                                        a.push(
+                                        <button key={pages[i - 1]} 
+                                        id={pages[i - 1]} 
+                                        className={currentPage === pages[i - 1] ? "btn-custom current-page" : "btn-custom"} 
+                                        onClick={e => {setCurrentPage(parseFloat(e.target.id)); handleSelected(e)}}
+                                        >
+                                        {pages[i - 1]}
+                                        </button>);
+                                    }
+
+                                    if(currentPage < max) {
+                                        a.push(
+                                            <button
+                                            key={-3}
+                                            id='next'
+                                            className="btn-custom"
+                                            onClick={(e) => handlePages(e)}
+                                            >
+                                            <i id='next' className="fa fa-angle-right"></i>
+                                            </button>
+                                        );       
+                                        a.push(
+                                            <button
+                                            key={-4}
+                                            className="btn-custom last"
+                                            onClick={(e) => {
+                                                handleSelected(e)
+                                                setCurrentPage(max);
+                                                if(max > 2) {                                                             
+                                                    setPages([max-2,max-1,max]);
+                                                } else {
+                                                    setPages([1,2])
+                                                }
+                                            }}
+                                            >
+                                            Último
+                                            </button>
+                                        );                                                 
+                                    }
+                                    return a;
+                                })()}
+                        </div>
+                    </div>
                     
-                    <Modal isOpen={modalRemove} setIsOpen={setModalRemove}>
-                        <div className="modal-body">
-                            <h3>Tem certeza que deseja excluir {allSelect.length} usuário(s) do sistema?</h3>
-                        </div>
-                        <div className="modal-footer">
-                            <button onClick={() => setModalRemove(false)} className="btn-custom warning">Cancelar</button>
-                            <button onClick={handleRemoveConfirm} className="btn-custom success">Confirmar</button>
-                        </div>
-                    </Modal>
+                </div>                   
+        </div>
+        <Modal isOpen={modalRemove} setIsOpen={setModalRemove}>
+        <div className="modal-body">
+            <h3>Tem certeza que deseja excluir {rowsSelected.length} usuário(s) do sistema?</h3>
+        </div>
+        <div className="modal-footer">
+            <button onClick={() => setModalRemove(false)} className="btn-custom warning">Cancelar</button>
+            <button onClick={handleRemoveConfirm} className="btn-custom success">Confirmar</button>
+        </div>
+        </Modal>
 
-                    <Modal isOpen={modalMultiple} setIsOpen={setModalMultiple}>
-                        <div className="modal-content">
-                            <div className="modal-body">
-                                <div className="modal-body-wrapper">
-                                    <div className="form-input">
-                                        <label>Mover para equipe:</label>
-                                        <select>
-                                        {
-                                            
-                                            infoRecords.equipeOptions.map((item, i) => {
-                                                return (
-                                                    <option key={`option-${i}`}>
-                                                        {item.equipe ?? "Indefinido"}
-                                                    </option>
-                                                )
-                                            })
-                                            
-                                        }
-                                        </select>
-                                    </div>
-
-                                    <div className="form-input">
-                                        <label>Desarquivar selecionados</label>
-                                        <input type="checkbox"/>
-                                    </div>
-                                </div>
-                               
-                                
-                            </div>
-                            <div className="modal-footer">
-                                <button onClick={() => setModalMultiple(false)} className="btn-custom warning">Cancelar</button>
-                                <button onClick={handleStatusConfirm} className="btn-custom success">Salvar</button>
-                            </div>
+        <Modal isOpen={modalMultiple} setIsOpen={setModalMultiple}>
+        <div className="modal-content">
+            <div className="modal-body">
+                <div className="modal-body-wrapper">
+                    <div className="form-input">
+                        <label>Mover para equipe:</label>
+                        <select name="team" onChange={handleMultiple}>
+                        {
+                            infoRecords.teamOptions.map((item, i) => {
+                                return (
+                                    <option value={item} key={`option-${i}`}>
+                                        {item != "" ? item : "Indefinido"}
+                                    </option>
+                                )
+                            })
+                            
+                        }
+                        </select>
+                    </div>             
+                        <div className="group-button">
+                            <input 
+                            onChange={()=>{}} 
+                            checked={multiple.unarchive} 
+                            name="unarchive" 
+                            onClick={handleMultiple} 
+                            type="checkbox"
+                            />
+                            <label>Desarquivar selecionados</label>
                         </div>
-                    </Modal>
+                </div>
+                
+                
+            </div>
+            <div className="modal-footer">
+                <button onClick={() => setModalMultiple(false)} className="btn-custom warning">Cancelar</button>
+                <button onClick={handleMultipleConfirm} className="btn-custom success">Salvar</button>
+            </div>
+        </div>
+        </Modal>
 
-                    <Modal isOpen={modalMain} setIsOpen={setModalMain}>
-                        <div className="modal-body">
-                            <div className="form-input">
-                                
-                            </div>
-                                
-                        </div>
-                    </Modal>
-                </div>          
-            </main>
-            <Footer />
+        <Modal isOpen={modalMain} setIsOpen={setModalMain}>
+        <div className="modal-body">
+            <div className="form-input">
+                
+            </div>
+                
+        </div>
+        </Modal>
+
+        </Layout>
         </>
     );
 }

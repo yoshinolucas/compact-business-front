@@ -23,7 +23,6 @@
 }
 
 .form-input label {
-    color: var(--black04);
     font-weight: 600;
 }
 
@@ -48,4 +47,39 @@
     background: rgb(239, 239, 239);
     display: block;
     width: 100%;
+    font-size: 18px;
+}
+
+.form-group-input {
+    display: flex;
+    gap:16px;
+}
+
+.form-input-checkbox {
+    display: flex;
+    color: var(--black04);
+    font-weight: 600;
+    align-items: center;
+    gap:24px
+}
+
+.form-input-checkbox input[type=checkbox] {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+}
+
+.form-input i {
+    cursor: pointer;
+}
+
+.form-input .dropdown {
+    position:relative;
+    left:90%;
+    bottom:30px;
+}
+
+.form-input .menu {
+    right: 90%;
+    margin-top:12px;
 }

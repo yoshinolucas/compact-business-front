@@ -38,7 +38,7 @@ const Login = () => {
                 password: password
             })
             .then((res) => {
-                login(res.data.token);
+                login(res.data);
                 return navigate("/home");
             })
             .catch((err) => {
@@ -57,12 +57,12 @@ const Login = () => {
             <main>
                 <div className='login'>
                     <div className='container'>
-                        <div className='wrapper'>
+                        <div className='login-wrapper'>
                             <div style={{visibility: loginIsFailed.status ? 'visible' : 'hidden'}} className='error'>
                                 <h5>{loginIsFailed.errorMsg}</h5>
                             </div>
                             <div className='container-wrapper'>
-                                <img src="https://source.unsplash.com/random/500x500/?sales" alt="banner-sales"/>
+                                <img src="img/login-banner.jpg" alt="banner-sales"/>
                                 <div className='login-form'>
                                     <div className='login-form-header'>
                                         <h2>Bem vindo! Faça o seu login para entrar.</h2>
@@ -84,20 +84,13 @@ const Login = () => {
                                             onChange={e=> setPassword(e.target.value)}
                                             style={{border: loginIsFailed.status && password === "" ? "1px solid rgb(167, 55, 90)" : "1px solid var(--black03)"}}
                                             />
-                                            <div>
-                                                <input type="checkbox"/>
-                                                <label>Lembrar</label>
-                                            </div>
                                             <button className='btn-custom' onClick={changeButtonSubmitStyle} type="submit">{buttonSubmitStyle}</button>
-                                        </Form> 
-                                        <div>
-                                            <Link>Esqueci minha senha</Link>
-                                        </div>                               
+                                        </Form>                                                                    
                                     </div>                                                        
-                                    <div className='login-form-footer'>
+                                    {/* <div className='login-form-footer'>
                                         <h2>Ou</h2>
                                         <Link className='btn-custom'>Crie uma conta</Link>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

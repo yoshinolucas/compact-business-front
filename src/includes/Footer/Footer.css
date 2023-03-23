@@ -1,4 +1,35 @@
 .bottom {
     background-color: var(--container);
-    height: 32rem;
+    height: 24rem;
+    padding: .5rem 6rem 2rem 6rem;
+}
+
+.bottom .bottom-wrapper {
+    display: flex;
+    gap:8px;
+}
+
+.bottom a,.bottom p,.bottom h3 {
+    color:var(--white02);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin:6px 0;
+    font-size: 14px;
+}
+
+.bottom h3 {
+    font-size: 17px;
+}
+
+.bottom-wrapper .logo {
+    width: 33%;
+}
+
+.bottom-wrapper .contato {
+    width: 33%;
+}
+
+.bottom-wrapper .redes {
+    width: 33%;
 }

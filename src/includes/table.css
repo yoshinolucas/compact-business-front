@@ -1,4 +1,47 @@
 
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--panel);
+  margin: 0;
+  color: var(--secondary02);
+  width: 1em;
+  height: 1em;
+  border: 1px solid var(--secondary04);
+  border-radius: 0.15em;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: .3s;
+}
+
+input[type=checkbox]:hover {
+  border: 1px solid var(--secondary02);
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  width: 1.1em;
+  height: 1.1em;
+  clip-path: polygon(28% 38%, 41% 53%, 75% 24%, 85% 41%, 40% 78%, 15% 50%);
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em var(--shadow05);
+  background-color: var(--info);
+}
+
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+
+
+
+
+
+
+
+
 .table-custom {
   width: 100%;
 }
@@ -12,7 +55,7 @@
   width: 100%;
 }
 
-.table-custom table th {
+.table-custom table th {  
   padding: 18px;
   color: white;
 }
@@ -37,7 +80,7 @@
 
 .table-custom table td {
   text-align: center;
-  padding: 10px;
+  padding: 18px;
   border-bottom: 1px solid var(--blackSoftOrWhite);
 }
 
@@ -141,6 +184,153 @@
 }
 
 .table-custom .table-custom-info-wrapper .group-button .table-custom-info-button:hover {
+  border-color: var(--secondary02);
+  background-color: var(--secondary02) !important;
+}
+
+.hidden {
+  display: none;
+}
+
+
+.table-custom-02 {
+  width: 100%;
+}
+
+.table-custom-02 table {
+  border: 1px solid var(--secondary05);
+  box-shadow: var(--shadow07);
+  background: var(--panel);
+  color: var(--secondary02);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table-custom-02 table th {
+  padding: 18px;
+}
+
+.table-custom-02 table th{
+  border-bottom: 1px solid var(--secondary05)
+
+}
+
+.table-custom-02 table th:first-child {
+  border-top-left-radius: 10px;
+}
+.table-custom-02 table th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.table-custom-02 table tr {
+  cursor: pointer;
+}
+
+.table-custom-02 table td {
+  text-align: center;
+  padding: 18px;
+  border-bottom: 1px solid var(--secondary05);
+}
+
+
+.table-custom-02 table tr:hover {
+  background-color: var(--white02);
+  box-shadow: var(--shadow01);
+  
+}
+
+.table-custom-02 table td:first-child {
+  border-left: 1px solid var(--white02);
+}
+
+.table-custom-02 table .selected {
+  background-color: var(--table02-selected) !important;
+}
+
+.table-custom-02 .table-custom-02-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-custom-02 .table-custom-02-footer h5{
+  color:var(--secondary02);
+  font-size: 14px;
+}
+
+.table-custom-02 .pages {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px
+}
+
+.table-custom-02 .pages .btn-custom{
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 100%;
+  background-color: var(--table02-page);
+  color: #fff;
+  margin: 8px 1px 0 0;
+  transition: .2s;
+}
+
+.table-custom-02 .pages .last{
+  margin-left:4px;
+  width: 80px;
+  border-radius: 0px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.table-custom-02 .pages .first{
+  margin-right:4px;
+  width: 80px;
+  border-radius: 0px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.table-custom-02 .pages .btn-custom:hover{
+  background-color: var(--table02-page-hover);
+}
+
+.table-custom-02 .pages .current-page {
+  background-color: var(--table02) !important;
+}
+
+.table-custom-02 .table-custom-02-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin:40px 0 8px 0;
+}
+
+.table-custom-02 .table-custom-02-info h4{
+  color: var(--black04);
+}
+
+.table-custom-02 .table-custom-02-info i {
+  font-size: 18px;
+}
+
+.table-custom-02 .table-custom-02-info-wrapper {
+  display: flex;
+  gap: 4px;
+}
+
+.table-custom-02 .table-custom-02-info-wrapper .group-button {
+  display: flex;
+  gap:4px;
+}
+.table-custom-02 .table-custom-02-info-wrapper .group-button .table-custom-02-info-button {
+  transition: .2s;
+  border-width: .1rem;
+}
+
+.table-custom-02 .table-custom-02-info-wrapper .group-button .table-custom-02-info-button:hover {
   border-color: var(--secondary02);
   background-color: var(--secondary02) !important;
 }
