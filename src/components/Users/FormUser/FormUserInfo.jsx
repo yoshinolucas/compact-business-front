@@ -405,7 +405,7 @@ const FormUserInfo = () => {
                                         </div>
                                         
             
-                                        <div className='group-button'>
+                                        <div className='wrapper gap-1'>
                                         <Link className='btn-custom warning' to="/users">Cancelar</Link>
                                             <Link className='btn-custom info' to={`/users/edit?id=${params.get('id')}&copy=${params.get('copy')}`}>Voltar</Link>
                                             <button className='btn-custom btn-long success' type="submit">Completar cadastro</button>  

@@ -3,23 +3,24 @@ import Footer from "../Footer";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 
-const Layout = ({children, hasSubtop, hasShadow, background, hasSidebar}) => {
+const Layout = ({
+    children,
+    hasSubtop, 
+    background, 
+    backgroundPanel,
+    hasSidebar}) => {
     return(
         <>
-        <Header hasSubtop={hasSubtop} hasShadow={hasShadow}/>
-        
-        <main style={{marginLeft: hasSidebar ? "90px" : '0px'}}>
-            <div className='produtos'>
-                <div className='container' style={{backgroundColor:background}}>
-                    <div className='panel'>
-                        {hasSidebar && <Sidebar />} 
-                        {children}
-                    </div>
+        <Header hasSubtop={hasSubtop}/>   
+        {hasSidebar && <Sidebar />} 
+        <main>
+            <div className='container' style={{backgroundColor:background,marginLeft: hasSidebar ? "90px" : '0px'}}>
+                <div className='panel' style={{backgroundColor:backgroundPanel}}>  
+                    {children}
                 </div>
             </div>
         </main>
         <Footer />
-        
         </>
     )
 }

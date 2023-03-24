@@ -5,16 +5,17 @@
   
 .search-wrapper i {
   left: 89%;
-  color: var(--secondary02);
+  color: var(--secondary03);
   position: relative;
 }
   
 .search-wrapper input.search {
-  border: 1px solid var(--secondary04);
+  border: 1px solid var(--secondary05);
   width: 300px;
   height: 40px;
   font-size: 16px;
-  background-color: var(--white02);
-  box-shadow: var(--shadow03);
+  border-radius: 4px;
+  background-color: var(--panel);
+  box-shadow: var(--shadow05);
   padding: 0 0 0 12px;
 }

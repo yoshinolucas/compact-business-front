@@ -12,6 +12,8 @@ import RadioPill from "../RadioPill";
 import RadioPillSwitch from "../RadioPillSwitch";
 import Layout from "../../includes/Layout";
 import { getUserId } from "../../services/auth";
+import * as XLSX from "xlsx/xlsx.mjs";
+import Divisor from "../Divisor";
 
 
 const Users = () => {
@@ -33,7 +35,6 @@ const Users = () => {
     const[ infoRecords, setInfoRecord ] = useState({maxItems: 15, totalPages: 1, totalRecords: 0,teamOptions: []});
     const[ modalRemove, setModalRemove ] = useState(false);
     const[ modalMultiple, setModalMultiple ] = useState(false);
-    const[ modalMain, setModalMain] = useState(false);
     const[ openMoreTeamOptions, setOpenMoreTeamOptions ] = useState(false);
     const[ openFilter, setOpenFilter] = useState(false);
     const[ filters , setFilters] = useState(defaultFilters);
@@ -49,6 +50,7 @@ const Users = () => {
     const [ currentPage, setCurrentPage] = useState(1);
     const [ pages, setPages ] = useState([1,2,3])
     const [ multiple, setMultiple ] = useState({team:'',unarchive:false});
+    const [ openImportModal, setOpenImportModal ] = useState(false);
 
     const handleSelected = (e) => {
         setMsg({show:false});   
@@ -237,6 +239,17 @@ const Users = () => {
             window.location.reload(false);
         }).catch(err => console.log(err))
     }
+    const handleExcel = (e) => {
+        var wb = XLSX.utils.book_new();
+        var ws = XLSX.utils.json_to_sheet(users);
+        XLSX.utils.book_append_sheet(wb,ws,"Equipe");
+
+        XLSX.writeFile(wb,"equipe.xlsx");
+    }
+    const handleImportFile = (e) => {
+        const file = e.target.files[0];
+        console.log(file)
+    }
 
     useEffect(() => {
         if(params.get("msg") === '1') setMsg({show:true, content: "Usuário cadastrado com sucesso.", style: "success"});
@@ -264,6 +277,7 @@ const Users = () => {
 
             setUser(res.data.users)
         }).catch(err => console.log(err));
+
     },[multiple,params,filters,search, currentPage,infoRecords.totalPagesWithFilters]);
 
     return(
@@ -288,22 +302,19 @@ const Users = () => {
 
         <div className="panel-body">
                 <div className="section">    
-
                     <div className="section-header">
                         <h4 className="section-title">Ferramentas</h4>
                     </div>  
                     <div className="section-body">
-                        <div className="section-wrapper" style={{display:'flex', justifyContent:'space-between'}}>
-                            <div className="group-button">
-                                <Link to={`/users/edit?id=0&copy=${rowsSelected[0]}`} className={document.querySelectorAll(".selected").length === 1 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-copy"></i>Duplicar</Link>
-                                <button onClick={handleArchive} className={rowsSelected.length > 0 ? "btn-custom btn-medium info" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-inbox"></i>Arquivar</button>
-                                <button onClick={handleOpenMultiple}  className={rowsSelected.length > 0 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-edit"></i>Alterar dados</button>                                                     
-                            </div>      
-                            <div className="group-button">
-                                <button className={rowsSelected.length > 0 ? "btn-custom btn-medium danger" : "btn-custom btn-border btn-medium disabled-border"} onClick={handleRemove}><i className="fa-solid fa-trash"></i>Excluir</button>
-                            </div>                                              
+                        <div className="section-wrapper">
+                            <Link to={`/users/edit?id=0&copy=${rowsSelected[0]}`} className={document.querySelectorAll(".selected").length === 1 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-copy"></i>Duplicar</Link>
+                            <button onClick={handleArchive} className={rowsSelected.length > 0 ? "btn-custom btn-medium info" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-inbox"></i>Arquivar</button>
+                            <button onClick={handleOpenMultiple}  className={rowsSelected.length > 0 ? "btn-custom btn-medium warning" : "btn-custom btn-border btn-medium disabled-border"}><i className="fa-solid fa-edit"></i>Alterar dados</button>                                                     
+                            <button className={rowsSelected.length > 0 ? "btn-custom btn-medium danger" : "btn-custom btn-border btn-medium disabled-border"} onClick={handleRemove}><i className="fa-solid fa-trash"></i>Excluir</button>
+                            <button onClick={handleExcel} title="Excel" className="btn-custom btn-medium success"><i className="fa fa-cloud-arrow-down"></i>Exportar</button>
+                            <button onClick={setOpenImportModal} title="Excel" className="btn-custom btn-medium info"><i className="fa fa-upload"></i>Importar</button>
                         </div>
-                                                                        
+                                                                    
                     </div>                                                                                                                               
                 </div>                
                 <div className="table-custom">
@@ -318,10 +329,10 @@ const Users = () => {
                             setPages={setPages}
                             handleSelected={handleSelected}
                             />
-                            <div className="group-button">   
+                            <div className="wrapper">
                                 <div className="dropdown">
                                     <button 
-                                    className="btn-custom btn-border table-custom-info-button" 
+                                    className="btn-custom btn-border btn-pill" 
                                     onClick={handleOpenFilter}><i className="fa-solid fa-filter"></i> 
                                     Filtros
                                     </button>
@@ -347,7 +358,6 @@ const Users = () => {
                                                         value={1} 
                                                         placeholder="Cadastro completo" 
                                                         css="success" 
-                                                        size="long"
                                                         />
                                                                                     
                                                         <CheckBoxPill 
@@ -384,8 +394,7 @@ const Users = () => {
                                                         <CheckBoxPill          
                                                         checked={filters.teams.length > 0 ? false : true}
                                                         placeholder="Qualquer equipe"
-                                                        css="info"
-                                                        size="long"/>
+                                                        css="info"/>
                                                     </div>
 
                                                     <div className="group-button">
@@ -394,20 +403,17 @@ const Users = () => {
                                                             var options = [];                                                                                    
                                                             for( var i = 0; i < 2; i++ ){
                                                                 var team = infoRecords.teamOptions[i]
-                                                                if(team !== undefined) {
+                                                                if(team != undefined)
                                                                     options.push(
                                                                         <CheckBoxPill 
-                                                                        key={i}
                                                                         placeholder={team !== "" ? team : "Indefinido"}
                                                                         css="info"
-                                                                        size="medium"
                                                                         value={team}
                                                                         onClick={handleFilter}
                                                                         defaultChecked={filters.teams.includes(team)}
                                                                         name="teams"
                                                                         />
                                                                     )
-                                                                }
                                                             }
                                                             
                                                             return options
@@ -420,50 +426,51 @@ const Users = () => {
                                                             var options = [];                                                                                    
                                                             for( var i = 2; i < 4; i++ ){
                                                                 var team = infoRecords.teamOptions[i]
-                                                                if(team != undefined) {
-                                                                    options.push(
-                                                                        <CheckBoxPill 
-                                                                        key={i}
-                                                                        placeholder={team !== "" ? team : "Indefinido"}
-                                                                        css="info"
-                                                                        size="medium"
-                                                                        value={team}
-                                                                        onClick={handleFilter}
-                                                                        defaultChecked={filters.teams.includes(team)}
-                                                                        name="team"
-                                                                        />
-                                                                    )
-                                                                }
+                                                                if(team != undefined)
+                                                                options.push(
+                                                                    <CheckBoxPill 
+                                                                    placeholder={team !== "" ? team : "Indefinido"}
+                                                                    css="info" 
+                                                                    value={team}
+                                                                    onClick={handleFilter}
+                                                                    defaultChecked={filters.teams.includes(team)}
+                                                                    name="teams"
+                                                                    />
+                                                                )
                                                             }
                                                             
                                                             return options
                                                         })())
                                                     }
                                                     </div>
-                                                    <button
-                                                    className="btn-custom btn-long btn-border btn-pill"
-                                                    onClick={e => setOpenMoreTeamOptions(!openMoreTeamOptions)}
-                                                    >Mais equipes</button>
-                                                    {
-                                                            openMoreTeamOptions && 
-                                                            <div className="select-custom select-multiple">
-                                                            {
-                                                                infoRecords.teamOptions.map((team, i) => {
-                                                                    if(i > 3) return (
-                                                                        <CheckBoxPill 
-                                                                        key={i}
-                                                                        defaultChecked={filters.teams.includes(team)}
-                                                                        css="info"
-                                                                        value={team} 
-                                                                        onClick={handleFilter}
-                                                                        name="team"
-                                                                        placeholder={team !== "" ? team : "Indefinido"}
-                                                                        />
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
+                                                    {   infoRecords.teamOptions.length > 3 &&
+                                                        <>
+                                                        <button
+                                                        className="btn-custom btn-long btn-border btn-pill"
+                                                        onClick={e => setOpenMoreTeamOptions(!openMoreTeamOptions)}
+                                                        >Mais equipes</button>
+                                                        {
+                                                                openMoreTeamOptions && 
+                                                                <div className="select-custom select-multiple">
+                                                                {
+                                                                    infoRecords.teamOptions.map((team, i) => {
+                                                                        if(i > 3) return (
+                                                                            <CheckBoxPill 
+                                                                            defaultChecked={filters.teams.includes(team)}
+                                                                            css="info"
+                                                                            value={team} 
+                                                                            onClick={handleFilter}
+                                                                            name="teams"
+                                                                            placeholder={team !== "" ? team : "Indefinido"}
+                                                                            />
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </div>
+                                                        }
+                                                        </>
                                                     }
+                                                    
                                                     
 
                                                     <h5>Data de cadastro</h5>
@@ -574,7 +581,7 @@ const Users = () => {
                                 </div>
                                 <div className="dropdown">
                                     <button 
-                                    className="btn-custom btn-border table-custom-info-button"
+                                    className="btn-custom btn-border btn-pill"
                                     onClick={handleOpenColumn}
                                     ><i className="fa-solid fa-table-columns"></i> Colunas</button>                                                          
                                     { 
@@ -679,8 +686,8 @@ const Users = () => {
                                             </div>
                                     }
                                 </div>                                       
-                                <div>
-                                    <button onClick={handleOpenOrder} className="btn-custom btn-border table-custom-info-button"><i className="fa-solid fa-arrow-down-wide-short"></i> Ordem</button>
+                                <div className="dropdown">
+                                    <button onClick={handleOpenOrder} className="btn-custom btn-border btn-pill"><i className="fa-solid fa-arrow-down-wide-short"></i> Ordem</button>
                                     { openOrder &&
                                         <div className="menu order-menu">
                                             <div className="menu-wrapper">
@@ -744,47 +751,48 @@ const Users = () => {
 
                                         </div>
                                     }       
-                                </div>
-                                
-                            </div>
-                        </div>
-                        
+                                </div> 
+                            </div> 
+                        </div>          
+                    </div>
+                    
+
+                    <div className="table-wrapper">
+                        <table className="table-custom-01">
+                            <thead>
+                                <tr>
+                                    <th id="user_all"><input 
+                                    onChange={() => {}} 
+                                    checked={rowsSelected.length === infoRecords.currentPageLength ? true : false} 
+                                    type="checkbox" 
+                                    onClick={handleSelected}
+                                    /></th>
+                                    {columns.show.map((column,i) => <th key={`showColumn-${i}`} className={columns.show[i] ? "" : "hidden"}>{columns.header[i]}</th>)}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map((user, i) => {
+                                    return(
+                                        <tr onClick={e => navigate(`/users/edit?id=${e.target.parentElement.id}&copy=0`)} key={`user-${i}`} id={user.id}>
+                                            <td onClick={e => { e.stopPropagation(); handleSelected(e) }}><input type="checkbox" /></td>
+                                            <td className={columns.show[0] ? "" : "hidden"}>{user.id}</td>
+                                            <td className={columns.show[1] ? "" : "hidden"}>{`${user.name} ${user.lastname ?? ""}`}</td>
+                                            <td className={columns.show[2] ? "" : "hidden"}>{user.username}</td>
+                                            <td className={columns.show[3] ? "" : "hidden"}>{user.email}</td>
+                                            <td className={columns.show[4] ? "" : "hidden"}>{user.team ? user.team : "Indefinido"}</td>
+                                            <td className={columns.show[5] ? "" : "hidden"} onClick={e=>e.stopPropagation(e)}>{STATUS_CADASTRO[user.archived === 1 ? 99 : user.status]}</td>
+                                            <td className={columns.show[6] ? "" : "hidden"}>{ROLES[user.role] ?? ROLES[4]}</td>
+                                            <td className={columns.show[7] ? "" : "hidden"}>{formatDate(user.created_at)}</td>
+                                            <td className={columns.show[8] ? "" : "hidden"}>{formatDate(user.updated_at)}</td>
+                                        </tr>
+                                    );
+                                })}                                         
+                            </tbody>
+                        </table>
                     </div>
 
-                    <table className="table-custom-01">
-                        <thead>
-                            <tr>
-                                <th id="user_all"><input 
-                                onChange={() => {}} 
-                                checked={rowsSelected.length === infoRecords.currentPageLength ? true : false} 
-                                type="checkbox" 
-                                onClick={handleSelected}
-                                /></th>
-                                {columns.show.map((column,i) => <th key={`showColumn-${i}`} className={columns.show[i] ? "" : "hidden"}>{columns.header[i]}</th>)}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((user, i) => {
-                                return(
-                                    <tr onClick={e => navigate(`/users/edit?id=${e.target.parentElement.id}&copy=0`)} key={`user-${i}`} id={user.id}>
-                                        <td onClick={e => { e.stopPropagation(); handleSelected(e) }}><input type="checkbox" /></td>
-                                        <td className={columns.show[0] ? "" : "hidden"}>{user.id}</td>
-                                        <td className={columns.show[1] ? "" : "hidden"}>{`${user.name} ${user.lastname ?? ""}`}</td>
-                                        <td className={columns.show[2] ? "" : "hidden"}>{user.username}</td>
-                                        <td className={columns.show[3] ? "" : "hidden"}>{user.email}</td>
-                                        <td className={columns.show[4] ? "" : "hidden"}>{user.team ? user.team : "Indefinido"}</td>
-                                        <td className={columns.show[5] ? "" : "hidden"} onClick={e=>e.stopPropagation(e)}>{STATUS_CADASTRO[user.archived === 1 ? 99 : user.status]}</td>
-                                        <td className={columns.show[6] ? "" : "hidden"}>{ROLES[user.role] ?? ROLES[4]}</td>
-                                        <td className={columns.show[7] ? "" : "hidden"}>{formatDate(user.created_at)}</td>
-                                        <td className={columns.show[8] ? "" : "hidden"}>{formatDate(user.updated_at)}</td>
-                                    </tr>
-                                );
-                            })}                                         
-                        </tbody>
-                    </table>
-
                     <div className="table-custom-footer">
-                        <h5>Total de {infoRecords.totalRecords} registros</h5>
+                        <h5>Total de {infoRecords.totalRecordsWithFilters ?? infoRecords.totalRecords} registros</h5>
                         
                         <div className="pages">
                             
@@ -813,7 +821,7 @@ const Users = () => {
                                             <button
                                             key={-2}
                                             id='previous'
-                                            className="btn-custom"
+                                            className="btn-custom btn-rounded"
                                             onClick={(e) => handlePages(e)}
                                             >
                                             <i id='previous' className="fa fa-angle-left"></i>
@@ -826,7 +834,7 @@ const Users = () => {
                                         a.push(
                                         <button key={pages[i - 1]} 
                                         id={pages[i - 1]} 
-                                        className={currentPage === pages[i - 1] ? "btn-custom current-page" : "btn-custom"} 
+                                        className={`btn-custom btn-rounded ${currentPage === pages[i - 1] ? "current-page" : ""}`} 
                                         onClick={e => {setCurrentPage(parseFloat(e.target.id)); handleSelected(e)}}
                                         >
                                         {pages[i - 1]}
@@ -838,7 +846,7 @@ const Users = () => {
                                             <button
                                             key={-3}
                                             id='next'
-                                            className="btn-custom"
+                                            className="btn-custom btn-rounded"
                                             onClick={(e) => handlePages(e)}
                                             >
                                             <i id='next' className="fa fa-angle-right"></i>
@@ -919,12 +927,13 @@ const Users = () => {
         </div>
         </Modal>
 
-        <Modal isOpen={modalMain} setIsOpen={setModalMain}>
-        <div className="modal-body">
+        <Modal isOpen={openImportModal} setIsOpen={setOpenImportModal}>
+        <div className="modal-content">
+            <h4>Importar arquivo Excel:</h4>
+            <Divisor margin={12}/>
             <div className="form-input">
-                
+                <input type="file" onChange={handleImportFile}/>                
             </div>
-                
         </div>
         </Modal>
 

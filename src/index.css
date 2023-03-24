@@ -6,7 +6,7 @@
 
 body {
   background-color: var(--panel);
-  font-family: sans-serif
+  font-family: 'montserrat',sans-serif
 }
 
 input {
@@ -18,7 +18,7 @@ button {
 }
 
 h1, h2, h3, h4, h5,label,button,span,p {
-  color: var(--black04)
+  color: var(--secondary02)
 }
 
 
@@ -37,7 +37,7 @@ h1, h2, h3, h4, h5,label,button,span,p {
 
 .hr {
   height: 1px;
-  background-color: var(--black05);
+  background-color: var(--secondary05);
 }
 
 .btn-custom {
@@ -47,8 +47,8 @@ h1, h2, h3, h4, h5,label,button,span,p {
   font-size: 16px;
   cursor: pointer;
   padding: 12px;
-  color:var(--whiteSoft01);
-  background-color: var(--container);
+  color:var(--white02);
+  background-color: var(--secondary01);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -63,7 +63,7 @@ h1, h2, h3, h4, h5,label,button,span,p {
 }
 
 .btn-medium {
-  width: 120px;
+  width: 130px;
   justify-content: space-around;
 }
 
@@ -71,22 +71,28 @@ h1, h2, h3, h4, h5,label,button,span,p {
   border-radius: 18px;
 }
 
+.section-wrapper {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
 .btn-border {
   background-color: transparent;
   border: solid;
   border-width: .12rem;
-  border-color: var(--secondary04);
-  color: var(--secondary02);
+  border-color: var(--secondary05);
+  color: var(--secondary03);
 }
 
 .btn-border:hover, .btn-border-min:hover {
-  background-color: var(--secondary02);
+  background-color: var(--secondary03);
   color: var(--white02)
 }
 
 .wrapper {
   display: flex;
-  gap:8px;
+  gap:4px;
   align-items: center;
 }
 
@@ -99,20 +105,20 @@ h1, h2, h3, h4, h5,label,button,span,p {
 .disabled-border{
   pointer-events: none;
   border-color: var(--disabled);
-  color: var(--disabledText);
+  color: var(--secondary03);
   transition: all 200ms ease-in-out;
-  background-color: var(--disabled-background);
+  background-color: var(--secondary02);
 }
 
 .section {
   border-radius: 4px;
-  background-color: var(--container);
+  background-color: var(--secondary01);
   margin-bottom: 16px;
   padding: 25px;
   box-shadow: var(--shadow04);
 }
 
-.section .section-title {
+.section .section-header h4 {
   margin-bottom: 8px;
   color: var(--white02);
 }
@@ -165,7 +171,7 @@ select {
 }
 
 .success-border:hover,.btn-custom.success:hover {
-  background-color: var(--successText) !important;
+  filter: brightness(.9);
 }
 
 .warning {
@@ -178,7 +184,7 @@ select {
 }
 
 .warning-border:hover,.btn-custom.warning:hover{
-  background-color: var(--warningText) !important;
+  filter: brightness(.9);
 }
 
 .danger {
@@ -191,7 +197,7 @@ select {
 }
 
 .danger-border:hover,.btn-custom.danger:hover {
-  background-color: var(--dangerText) !important;
+  filter:brightness(.9)
 }
 
 .info {
@@ -204,10 +210,14 @@ select {
 }
 
 .info-border:hover,.btn-custom.info:hover{
-  background-color: var(--infoText) !important;
+  filter:brightness(.9)
 }
 
-
+.btn-rounded {
+  border-radius: 100%;
+  width: 45px;
+  height: 43px;
+}
 
 .panel-header {
   margin-bottom: 32px;
@@ -224,11 +234,6 @@ select {
   gap:4px
 }
 
-.panel-white {
-  background-color: var(--panel);
-  box-shadow: var(--shadow02);
-}
-
 .panel-header .panel-title {
   align-items: center;
   display: flex;
@@ -236,12 +241,27 @@ select {
 
 .panel-header .panel-title h3 {
   margin-left:4px;
-  font-size: 24px;
+  font-size: 20px;
 }
 
-.panel-header .panel-subtitle {
-  font-size: 16px;
-  margin-top:8px;
+.panel-tab {
+  flex-wrap: wrap;
+  display: flex;
+  margin: 30px 0 16px 0;
+  border-bottom: 1px solid var(--secondary05);
+  gap:30px;
+}
+.panel-tab a {
+  transition: all 120ms ease-in-out;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 6px;
+}
+
+.panel-tab .current {
+  border-bottom: 2px solid var(--primary02);
+}
+.panel-tab a:hover{
+  border-bottom: 2px solid var(--primary02);
 }
 
 .select-custom {
@@ -274,40 +294,34 @@ select {
   position: absolute;
   border-radius: 4px;
   padding: 26px 18px;
+  display: grid;
+  justify-content: center;
 }
 
 .menu-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;
-  gap: 50%;
 }
 
 .menu-header .btn-custom {
   font-size: 14px;
   height: 30px;
-  padding:0
-}
-
-.menu-body h5 {
-  margin: 16px 0 4px 0;
-}
-
-.menu-body .group-button {
-  margin-bottom: 6px;
 }
 
 .menu-body {
-  margin-bottom: 18px;
+  gap:4px;
+  display: grid;
 }
-
 
 .status-table {
   padding: 5px;
   border-radius: 18px;
   color: var(--white02);
   margin: 0 10%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .wrapper-content {

@@ -93,18 +93,18 @@ const Records = () => {
                         <div className='modal-records-wrapper'>
                             <div>
                                 <h4>Antes</h4>
-                                <table>
-                                <tbody>
-                                {render(recordSelected,'before')}
-                                </tbody>
+                                <table className='before'>
+                                    <tbody>
+                                    {render(recordSelected,'before')}
+                                    </tbody>
                                 </table>
                             </div>
                             <div>
                                 <h4>Depois</h4>
-                                <table>
-                                <tbody>
-                                {render(recordSelected,'after')}   
-                                </tbody> 
+                                <table className='after'>
+                                    <tbody>
+                                    {render(recordSelected,'after')}   
+                                    </tbody> 
                                 </table>                       
                             </div>
                         </div>                     

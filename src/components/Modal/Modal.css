@@ -1,4 +1,3 @@
-
 .background-modal,.background-modal-shadow {
     width: 100vw;
     height: 100vh;
@@ -16,7 +15,6 @@
 
 .modal{
     border-radius: 12px;
-    width: 500px;
     background: var(--panel); 
     box-shadow: var(--shadow02); 
     padding:24px 32px;

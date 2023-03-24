@@ -1,5 +1,5 @@
 import './Modal.css';
-const Modal = ({ children, isOpen, id="modal", setIsOpen, windowClose = true }) => {
+const Modal = ({ children, isOpen, id="modal", setIsOpen, windowClose = true, }) => {
     if(!isOpen) return null;
 
     const handleWindowsClose = (e) => {

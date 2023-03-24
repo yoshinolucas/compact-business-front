@@ -1,5 +1,5 @@
 .bottom {
-    background-color: var(--container);
+    background-color: var(--secondary01);
     height: 24rem;
     padding: .5rem 6rem 2rem 6rem;
 }

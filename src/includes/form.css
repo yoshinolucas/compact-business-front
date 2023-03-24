@@ -12,6 +12,8 @@
     display: flex;
     gap: 24px;
     padding: 32px 0;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .form-section {

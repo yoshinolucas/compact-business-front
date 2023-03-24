@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import api from "./api";
 
 export const TOKEN_KEY = "token";
@@ -12,8 +12,9 @@ export const getUserId = () => localStorage.getItem(USER_ID);
 export const getAccessId = () => localStorage.getItem(ACCESS_ID);
 export const login = data => {
   localStorage.setItem(TOKEN_KEY, data.token);
-  localStorage.setItem(USER_ID, data.userId);
-  localStorage.setItem(ROLE, data.role);
+  localStorage.setItem(USER_ID, data.user.id);
+  localStorage.setItem(ROLE, data.user.role);
+  
   api.post(`/accesses/register/${getUserId()}`).then(
     res=>localStorage.setItem(ACCESS_ID, res.data)
   );

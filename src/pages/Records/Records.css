@@ -3,12 +3,11 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-}
-.modal-records-wrapper ul {
-    list-style: none;
+    gap:24px;
 }
 
 .modal-records-wrapper table,.modal-records-wrapper td{
+    cursor: pointer;
     border-collapse: collapse;
     border:1px solid var(--secondary03);
 }

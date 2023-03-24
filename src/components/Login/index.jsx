@@ -64,8 +64,14 @@ const Login = () => {
                             <div className='container-wrapper'>
                                 <img src="img/login-banner.jpg" alt="banner-sales"/>
                                 <div className='login-form'>
+                                    
                                     <div className='login-form-header'>
-                                        <h2>Bem vindo! Faça o seu login para entrar.</h2>
+                                        <div className='wrapper'>
+                                            <img width='190' src="img/logowhite.png"/>
+                                        </div>
+                                        <div>
+                                            <h3>Bem vindo! Faça o seu login para entrar.</h3>   
+                                        </div>
                                     </div>
                                     <div className='login-form-body'>
                                         <Form

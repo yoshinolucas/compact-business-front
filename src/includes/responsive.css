@@ -1,180 +1,44 @@
-@media only screen and (max-width: 2300px) {
-
-}
-
-
 @media only screen and (max-width: 1900px) {
 
     .panel {
         width: 80%;
     }
 
-    
 }
 
-@media only screen and (max-width: 1400px) {
+
+@media only screen and (max-width: 1240px) {
+
     .panel {
         width: 100%;
     }
-}
 
-@media only screen and (max-width: 1200px) {
-
+    .table-custom .menu {
+        right: 5%
+    }
 
 }
 
 @media only screen and (max-width: 1080px) {
-    .menu {
-        right:5%;
-    }
-    .login img {
-        display: none;
-    }
 
-
-    .login-form {
-        width: 50% !important;
-    }
-    .form-wrapper {
-        display: block !important; 
-    }
-
-    .panel-header .panel-header-status div{
-        padding: 5px 24px 0px 24px;
-        height: 80px;   
-    }
-    .panel {
-        margin: .5rem;
-    }
+   .panel {
+        margin: 0;
+   }
 }
 
-@media only screen and (max-width: 960px) {
-    
-    .panel-header .panel-header-status div{
-        padding: 5px 12px 0px 12px;
-        height: 85px;   
-    }
+@media only screen and (max-width: 920px) {
+
+ }
+
+@media only screen and (max-width: 720px) {
     .panel {
-        margin: 10px 0 5rem 0;
+        padding: 48px 16px;
     }
-
-
-    
-}
-
-@media only screen and (max-width: 860px) {
-    .table-custom .table-custom-info-wrapper {
-        display: block !important;
-    }
-
-    .table-custom .table-custom-info-wrapper .group-button{
-        margin-top: 8px;
-    }
-
     .close-sidebar {
         display: none;
     }
-
-    main {
-        margin-left:0 !important
+    .container {
+        margin-left:0 !important;
     }
 
-    .openbtn-sidebar {
-        border: 1px solid var(--secondary04) !important
-    }
-
-    
-}
-
-@media only screen and (max-width: 740px) {
-    
-
-    .panel-header .panel-header-status div:last-child{
-        display: none;
-    }
-
-    .panel-header .panel-header-status div{
-        width: 25%; 
-    }
-
-    .table-custom table th:last-child,
-    .table-custom table td:last-child, 
-    .table-custom table th:nth-child(6),
-    .table-custom table td:nth-child(6)
-    {
-        display: none;
-    }
-}
-
-@media only screen and (max-width: 640px) {
-
-    .group-button{
-        display: block;
-        width: 100%;
-    }
-
-    .group-button .btn-custom,.menu-header i{
-        width: 100%;
-        margin-bottom: 8px;
-    }
-    .table-custom table th:last-child,
-    .table-custom table td:last-child, 
-    .table-custom table th:nth-child(5),
-    .table-custom table td:nth-child(5)
-    {
-        display: none;
-    }
-
-
-
-    .panel-header-wrapper {
-        display: block;
-    }
-
-    .panel-header .panel-title {
-        margin-bottom:16px;
-    }
-}
-
-@media only screen and (max-width: 560px) {
-    .table-custom-info {
-        display: block !important;
-    }
-
-    .table-custom-info h4 {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 12px;
-    }
-
-    .table-custom-info-wrapper .group-button {
-        justify-content: center;
-    }
-
-    .table-custom-info-wrapper .cols-menu .group-button {
-        justify-content: flex-start;
-    }
-
-    .search-wrapper input.search {
-        width: 89% !important;
-    }
-
-    .search-wrapper i {
-        left: 85% !important;
-    }
-
-    .panel-header .panel-header-status div:nth-child(4){
-        display: none;
-    }
-
-    .panel-header .panel-header-status div{
-        width: 33%;
-    }
-    .table-custom table th:last-child,
-    .table-custom table td:last-child, 
-    .table-custom table th:nth-child(4),
-    .table-custom table td:nth-child(4)
-    {
-        display: none;
-    }
 }
