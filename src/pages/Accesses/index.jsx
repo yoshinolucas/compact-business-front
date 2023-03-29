@@ -17,8 +17,15 @@ const Accesses = () => {
     const [ params ] = useSearchParams();
     const navigate = useNavigate();
 
+    const renderMsg = (content,style) => {
+        setMsg({show:true,content:content,style:style})
+        setTimeout(()=>{
+            setMsg({show:false})
+        },2000)
+        
+    }
     useEffect(() => {
-        if(params.get('msg')==='3') setMsg({show:true,content:"Histórico limpo com sucesso.", style:"info"})
+        if(params.get('msg')==='1') renderMsg("Histórico limpo com sucesso.","success")
         
         api.post("/accesses/pages",infoTable).then(res=> {
             setAccesses(res.data.accesses);    
@@ -76,48 +83,29 @@ const Accesses = () => {
     const handleRemove = (e) => {
         api.post("/accesses/delete",{ids:accessesSelected}).then(
             res=> {
-                navigate("/acessos?msg=3");
+                navigate("/acessos?msg=1");
                 window.location.reload(false);
             }
         );
     }
 
-    const handleRemoveAll = (e) => {
-        api.post("/accesses/deleteall",{ids:accessesSelected});
-    }
-
-
     return(
         <>
         <Layout hasSidebar={true} background={'var(--panel)'}>
         <div className='panel-header'>
-            <div className='panel-header-wrapper'>
-                <div className='panel-title'> 
-                <Link to="/home"><h4><u>Início</u></h4></Link> <h4>&nbsp;&nbsp;&gt;&nbsp; </h4> <h3> Histórico de acessos</h3>
-                </div>
+            <div className='wrapper'>
+                <Link to="/home"><p><u>Início</u>/</p></Link><h3>Histórico de acessos</h3>
             </div>
             <MsgText show={msg.show} content={msg.content} style={msg.style}/>
-            <hr />
         </div>
 
 
         <div className='panel-body'>
             <section>
-                <div className='section'>
-                    <div className='section-header'>
-                        <h4>Ferramentas</h4>
-                    </div>
-                    <div className='section-body'>
-                        <div className='section-wrapper'>
-                            <button onClick={handleRemove} className={`btn-custom ${accessesSelected.length > 0 ? 'danger':'btn-border  disabled-border'}`}><i className='fa fa-trash'></i>Limpar</button>
-                            <button onClick={handleRemoveAll} className={`btn-custom danger btn-medium`}><i className='fa fa-trash'></i>Limpar tudo</button>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-            <section>
             <div className='table-custom'>
+                <div className='wrapper space-between'>
+                    <button onClick={handleRemove} className={`btn-custom ${accessesSelected.length > 0 ? 'btn-icon danger':'btn-icon disabled-border'}`}><i className='fa fa-trash'></i></button>
+                </div>
                 <div className='table-wrapper'>
                 <table>
                     <thead>

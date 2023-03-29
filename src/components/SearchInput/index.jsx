@@ -7,12 +7,12 @@ const SearchInput = ({search, setSearch, setCurrentPage, setPages, handleSelecte
             <i className="fa fa-search"></i>
             <input className="search border-radius03" value={search} 
         onChange={e => { 
-            setSearch(e.target.value); 
-            setCurrentPage(1); 
+            setSearch(v=>({...v,search:e.target.value})); 
+            setCurrentPage(v=>({...v,currentPage:1})); 
             setPages([1,2,3]);
             handleSelected(e);
         }} 
-        placeholder="Pesquisar"/>                                        
+        placeholder="Pesquisar..."/>                                        
         </div> 
     )
 }

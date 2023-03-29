@@ -5,8 +5,8 @@
 .table-custom {
   width: 100%;
   display: grid;
+  margin-top:24px;
   gap:6px;
-  margin-top:32px;
 }
 
 .table-custom table {
@@ -35,31 +35,32 @@
 }
 
 .table-custom table th {
-  border-right:1px solid var(--secondary05)
+  font-size:15.5px
 }
 .table-custom table tbody tr:hover {
-  background-color: var(--secondary05);
+  background-color: var(--white02);
   box-shadow: var(--shadow04);
+}
+
+.table-custom .options-hidden {
+  float: right;
+}
+
+.table-custom .options-hidden i{
+  display: none;
+}
+
+.table-custom table tr:hover .options-hidden i{
+  display:initial;
 }
 
 .table-custom table .selected {
   background-color: var(--table01-selected) !important;
 }
 
-.table-custom-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
 
-.table-custom .table-custom-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 
-.table-custom .pages .last{
+.table-custom .last{
   margin-left:4px;
   width: 80px;
   border-radius: 0px;
@@ -67,31 +68,12 @@
   border-bottom-right-radius: 20px;
 }
 
-.table-custom .pages .first{
+.table-custom .first{
   margin-right:4px;
   width: 80px;
   border-radius: 0px;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
-}
-
-.table-custom .table-custom-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.table-custom .table-custom-info-wrapper {
-  display: flex;
-  gap: 4px;
-}
-
-.table-custom .table-custom-info-wrapper {
-  display: flex;
-  justify-content: end;
-  gap:8px;
-  flex-wrap: wrap;
 }
 
 .hidden {

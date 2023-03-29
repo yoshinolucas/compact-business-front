@@ -39,7 +39,7 @@ const Login = () => {
             })
             .then((res) => {
                 login(res.data);
-                return navigate("/home");
+                return navigate("/inicio");
             })
             .catch((err) => {
                 if(err.response.status === 404) {

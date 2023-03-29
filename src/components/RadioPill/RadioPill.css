@@ -1,4 +1,4 @@
-.radio-hidden input[type=radio],.select-multiple input[type=radio],.menu-wrapper input[type=radio]{display:none;}
+.radio-pill input[type=radio]{display:none;}
 
 
 input[type=radio]:checked + label.btn-radio {

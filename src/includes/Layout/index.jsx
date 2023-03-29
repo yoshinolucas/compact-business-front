@@ -1,25 +1,20 @@
-import { useEffect } from "react";
 import Footer from "../Footer";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 
 const Layout = ({
     children,
-    hasSubtop, 
     background, 
-    backgroundPanel,
-    hasSidebar}) => {
+    backgroundPanel}) => {
     return(
         <>
-        <Header hasSubtop={hasSubtop}/>   
-        {hasSidebar && <Sidebar />} 
-        <main>
-            <div className='container' style={{backgroundColor:background,marginLeft: hasSidebar ? "90px" : '0px'}}>
-                <div className='panel' style={{backgroundColor:backgroundPanel}}>  
+        <Header/>   
+        <Sidebar />
+            <main>
+                <div className='panel'>  
                     {children}
                 </div>
-            </div>
-        </main>
+            </main>
         <Footer />
         </>
     )

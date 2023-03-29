@@ -1,20 +1,2 @@
-.faturamento .cards {
-    margin-bottom: 32px;
-    width: 100%;
-    display: flex;
-    gap: 24px;
-}
 
-.faturamento .card {
-    height: 170px;
-    width: 33%;
-    border-radius: 8px;
-    box-shadow: var(--shadow04);
-    padding:8px;
-}
-
-.faturamento .card .card-header {
-    padding:16px;
-    gap:16px;
-}
 

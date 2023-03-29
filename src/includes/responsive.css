@@ -1,44 +1,42 @@
 @media only screen and (max-width: 1900px) {
-
     .panel {
         width: 80%;
     }
+}
 
+@media only screen and (max-width: 1400px) {
+    .panel {
+        width: 100%;
+    }
 }
 
 
 @media only screen and (max-width: 1240px) {
 
-    .panel {
-        width: 100%;
-    }
-
     .table-custom .menu {
         right: 5%
     }
+    
 
 }
-
-@media only screen and (max-width: 1080px) {
-
-   .panel {
-        margin: 0;
-   }
-}
-
-@media only screen and (max-width: 920px) {
-
- }
 
 @media only screen and (max-width: 720px) {
-    .panel {
-        padding: 48px 16px;
+    .table-custom .table-custom-info .wrapper .search-wrapper,
+    .table-custom .table-custom-info .wrapper .search-wrapper input {
+       width: 97% !important;  
+       margin:6px 0;  
     }
+
+    .panel {
+        margin:0;
+        padding:8px;
+    }
+    
     .close-sidebar {
         display: none;
     }
-    .container {
-        margin-left:0 !important;
+    main {
+        margin-left:0;
     }
 
 }

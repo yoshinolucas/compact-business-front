@@ -17,7 +17,7 @@
     --black02: #444;
     --black03: #1f1f1f;
     --black04: rgba(0, 0, 0, 0.6);
-    --black05: rgba(0, 0, 0, 0.3);
+    --black05: rgb(156, 156, 156);
   
     --shadow01: 0 5px 10px 0px rgba(0,0,0,0.2);
     --shadow02: 11px 22px 42px rgba(0, 0, 0, 0.1);
@@ -32,13 +32,13 @@
     --blackOrWhite: black;
     --whiteOrBlack: white;
 
-    --table01-selected: rgba(116, 175, 207, 0.8);
+    --table01-selected: rgba(180, 211, 228, 0.8);
   
     --success: rgb(40, 168, 100);
     --info: rgba(40, 168, 149);
     --danger: rgb(167, 55, 90);
     --warning: rgb(233, 111, 66);
-    --disabled: rgba(128, 128, 128, 0.7);
+    --disabled: rgba(133, 132, 132, 0.7);
 
    
   }

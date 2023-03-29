@@ -50,7 +50,8 @@ export const ROLES = {
 }
 
 export const SECTIONS = {
-    1: "Equipe"
+    1: "Equipe",
+    2: "Estoque"
 }
 
 export const ACTIONS = {
@@ -75,4 +76,9 @@ export const register = (userId,section,action,before,after) => {
         after: afterJson,
         action: action
     })
+}
+
+export const TIPOS = {
+    1: "Entrada",
+    2: "Saída"
 }

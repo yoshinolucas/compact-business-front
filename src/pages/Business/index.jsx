@@ -37,9 +37,9 @@ const Business = () => {
         <>
         <Layout hasSidebar={true}>
         <div className='panel-header'>
-            <div className='panel-header-wrapper'>
-                <div className='panel-title'> 
-                    <Link to="/home"><h5><u>Início</u></h5></Link> <h4>&nbsp;&nbsp;&gt;&nbsp; </h4> <h3>Negócios gerais</h3>
+            <div className='wrapper space-between'>
+                <div className='wrapper'>
+                    <Link to="/home"><u>Início</u> /</Link><h3>Negócios gerais</h3>
                 </div>
                 <Link className='btn-custom success btn-pill btn-medium'><i className='fa fa-add'></i>Novo</Link>
             </div>

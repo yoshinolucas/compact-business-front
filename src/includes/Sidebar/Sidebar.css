@@ -61,7 +61,7 @@
 }
 
 .sidebar nav p {
-    width: 80%;
+    width: 60%;
 }
 
 .sidebar nav i {
@@ -79,7 +79,7 @@
 }
 
 .sidebar nav a:hover .markdown-btn {
-    background-color: var(--primary01);
+    background-color: var(--primary02);
 }
 
 .sidebar .sub-menu-sidebar {

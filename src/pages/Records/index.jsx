@@ -1,28 +1,98 @@
 import './Records.css';
 import Layout from '../../includes/Layout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ACTIONS, formatDate, SECTIONS } from '../../services/config';
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import Modal from '../../components/Modal';
+import MsgText from '../../components/MsgText';
 
 
 const Records = () => {
-    const [ msg, setMsg ] = useState({});
+    const [ msg, setMsg ] = useState({show:false});
     const [ records, setRecords ] = useState([]);
     const [ infoTable, setInfoTable ] = useState({maxItems:15, currentPage:1, filters:{},search:""})
     const [ columns, setColumns ] = useState([]);
     const [ openModal, setOpenModal ] = useState(false);
     const [ recordSelected, setRecordSelected ] = useState({});
+    const [ rowsSelected, setRowsSelected ] = useState([]);
+    const navigate = useNavigate();
+    const [params] = useSearchParams();
 
+    const renderMsg = (content,style) => {
+        setMsg({show:true,content:content,style:style})
+        setTimeout(()=>{
+            setMsg({show:false})
+        },2000)
+        
+    }
     useEffect(() => {
+        if(params.get("msg")==='1') renderMsg("Registros apagados com sucesso.","success");
         api.post("/records/pages",infoTable).then(res=> {
+            setInfoTable(v => ({
+                ...v,
+                maxItems:res.data.maxItems,
+                currentPage:res.data.currentPage,
+                filters:res.data.filters,
+                currentPageLength:res.data.currentPageLength,
+                search:res.data.search
+            }));
             setRecords(res.data.records)
         });
     },[]);
 
     const handleRecordSelected = (id) => {
         setRecordSelected(records.find(record => record.id === id));
+    }
+
+    const handleRemove = (e) => {
+        api.post("/records/delete",{ids:rowsSelected}).then(res=>{
+            navigate("/alteracoes?msg=1")
+            window.location.reload(false);
+        })
+    }
+
+    const handleSelected = (e) => {
+        setMsg({show:false});   
+        var row = e.target.tagName === 'TD' ?
+        e.target.parentElement  :
+        e.target.parentElement.tagName === 'TD' ?  e.target.parentElement.parentElement : 
+        null;
+
+        var checkbox = e.target.tagName === 'TD' ?
+        e.target.children[0] : 
+        e.target.parentElement.tagName === 'TD' ? e.target : 
+        null;
+
+        if(row === null && checkbox === null) {
+            var rows = document.querySelectorAll("tbody tr");
+            setRowsSelected([]); 
+            var allCheckbox = e.target;
+            if(allCheckbox.checked) {                               
+                for(let i = 0; i < rows.length; i++) {
+                    rows[i].className = "selected"
+                    checkbox = rows[i].children[0].children[0];
+                    checkbox.checked = true;              
+                    setRowsSelected(values => [...values,parseFloat(rows[i].id)]);                   
+                }
+            } else {
+                for(let i = 0; i < rows.length; i++) {
+                    rows[i].className = ""
+                    checkbox = rows[i].children[0].children[0];
+                    checkbox.checked = false;
+                }
+            }             
+        } else {
+            if(row.classList.contains('selected')) {
+                checkbox.checked = false;
+                row.className = "";     
+                setRowsSelected(values => values.filter(value => value !== parseFloat(row.id)))          
+            } else { 
+                checkbox.checked = true;
+                row.className = "selected";
+                setRowsSelected(values => [...values,parseFloat(row.id)])
+            }
+        }
     }
 
     const render = (obj,role) => {
@@ -46,20 +116,25 @@ const Records = () => {
         <>
         <Layout hasSidebar={true} background={'var(--panel)'}>
         <div className='panel-header'>
-            <div className='panel-header-wrapper'>
-                <div className='panel-title'> 
-                <Link to="/home"><h4><u>Início</u></h4></Link> <h4>&nbsp;&nbsp;&gt;&nbsp; </h4> <h3> Histórico de alterações</h3>
-                </div>
+            <div className='wrapper'>
+            <Link to="/home"><p><u>Início</u>/</p></Link><h3> Histórico de alterações</h3>
             </div>
-            <hr />
+            <MsgText show={msg.show} content={msg.content} style={msg.style}/>
         </div>
 
 
         <div className='panel-body'>
             <div className='table-custom'>
-                <table className='table-custom-01'>
+                <div className='wrapper space-between'>
+                    <button onClick={handleRemove} className={`btn-custom ${rowsSelected.length > 0 ? 'btn-icon danger':'btn-icon disabled-border'}`}><i className='fa fa-trash'></i></button>
+                </div>
+                <table>
                     <thead>
                         <tr>
+                            <th><input
+                            onChange={()=>{}}
+                            checked={infoTable.currentPageLength === rowsSelected.length}
+                            onClick={handleSelected} type="checkbox"/></th>
                             <th>Seção</th>
                             <th>Usuário</th>
                             <th>Ação</th>
@@ -74,6 +149,7 @@ const Records = () => {
                                         handleRecordSelected(parseFloat(e.target.parentElement.id));
                                         setOpenModal(true);
                                     }} id={record.id} key={i}>
+                                        <td onClick={e=>{e.stopPropagation(); handleSelected(e)}}><input onChange={()=>{}} type="checkbox"/></td>
                                         <td>{SECTIONS[record.section]}</td>
                                         <td>{record.userId}</td>                              
                                         <td>{ACTIONS[record.action]}</td>

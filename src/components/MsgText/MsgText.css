@@ -1,9 +1,12 @@
 .msg {
+    position: absolute;
+    left:15%;
+    right:10%;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 48px;
-    margin: 0 0 16px 0;
+    padding: 16px;
     border-radius: 2px;
 }
 

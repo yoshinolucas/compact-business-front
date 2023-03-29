@@ -29,6 +29,13 @@ const FormUser = () => {
     const [ teamOptions, setTeamOptions ] = useState([]);
     const [ registerUser, setRegisterUser ] = useState([]);
 
+    const renderMsg = (content,style) => {
+        setMsg({show:true,content:content,style:style})
+        setTimeout(()=>{
+            setMsg({show:false})
+        },3000)  
+    }
+
     const handleSubmit2 = (e) => {
         if(validate()){
             api.post("/users/create", inputs)
@@ -38,7 +45,7 @@ const FormUser = () => {
                     navigate("/users?msg=1")
                 })     
             })
-            .catch(err => setMsg({show:true, content:"Campos como Username ou Email já foram cadastrados anteriormente.",style:"warning"}))
+            .catch(err => renderMsg("Campos como Username ou Email já foram cadastrados anteriormente.","warning"))
         }   
     }
     const handleChanges = (e) => {
@@ -47,13 +54,18 @@ const FormUser = () => {
     }
 
     const validate = () => {
-        if(inputs.username === "" || inputs.password === "" 
-        || inputs.email === "" || inputs.name === "") { 
-            setMsg({show: true, content:"Por favor, verifique os campos obrigatórios.", style: "danger"}) 
+        if(inputs.username === "" 
+            ||inputs.email === "" 
+            || inputs.name === "") { 
+            renderMsg("Por favor, verifique os campos obrigatórios.","danger") 
+            return false;
+        }
+        if(inputs.password === "" && params.get('id') === '0') {
+            renderMsg("Por favor, digite uma senha","danger");
             return false;
         }
         if(hasUpperCase(inputs.username)) {
-            setMsg({show:true, content:"Username deve conter apenas letras minúsculas e números", style:"warning"})
+            renderMsg("Username deve conter apenas letras minúsculas e números","warning")
             return false;
         }
 
@@ -106,11 +118,9 @@ const FormUser = () => {
             : `/users/details/${params.get('copy')}`;
             api.get(url)
             .then(res => {
-                formatApi(res.data);
-                setInputs(res.data);
-                setRegisterUser(res.data);
-                if(res.data.addressId == '') setInputs(v=>({...v,addressId:0}));
-                if(res.data.documentId == '') setInputs(v=>({...v,documentId:0}));
+                console.log(res.data)
+                setInputs(res.data[0]);
+                setRegisterUser(res.data[0]);
             })
         }
 
@@ -122,170 +132,127 @@ const FormUser = () => {
             date_range: ['1909-01-01','2100-01-01'],
             order: ''
         }}).then((res)=>{
-            const teamOptions = res.data.teamOptions.map(item=>item.team.trim());
-            setTeamOptions(teamOptions);
-            console.log(teamOptions)
+            setTeamOptions(res.data.teamOptions);
         }).catch(err => console.log(err));
         
     }, [params])
-
-        
-        
-    
     return(
         <>
             <Layout>
                 <div className='panel-header'>   
-                    <div className='panel-title'>
-                        <Link style={{marginRight:'32px'}} className='transparent' to="/users"><i className='fa fa-arrow-left'></i></Link>
-                        <h4>Equipe</h4> <h3> / {params.get("id") > 0 ? 'Editar Usuário' : 'Novo Usuário'}</h3>
-                    </div>                            
-                    
-                    
-                        
+                    <Link to="/users"><i className='fa fa-arrow-left'></i></Link>
+                    <h3>{params.get("id") > 0 ? 'Editar Usuário' : 'Novo Usuário'}</h3>                           
                     <MsgText show={msg.show} style={msg.style} content={msg.content}/>
                 </div>
-
-
-                <div className='panel-body'>
-                    <div className='form-custom'>                  
-                        <Form
-                        onSubmit={userFormHandler}
-                        method='post'>
-
-                            <div className='form-section'>
-                                <div className='form-section-header'>
-                                    <h3 className='form-section-title'>Dados pessoais</h3>
-                                    <div className='hr'></div>
-                                </div>
-                            
-                                <div className='form-wrapper'>
-                                    <div className='col-1'>
-                                        <div className='form-input'>
-                                            <label>Nome:</label>
-                                            <input 
-                                            style={{border: msg.show && inputs.name === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}} 
-                                            onChange={handleChanges} 
-                                            value={inputs.name} 
-                                            name="name" 
-                                            type="text"/>
-                                        </div>    
-                                                                                                                                                    
-                                    </div>
-                                    <div className='col-2'>
-                                        <div className='form-input'>
-                                            <label>Sobrenome (Opcional):</label>
-                                            <input 
-                                            onChange={handleChanges} 
-                                            value={inputs.lastname} 
-                                            name="lastname" 
-                                            type="text" />
-                                        </div>
-                                                                            
-
-                                    </div>  
-                                </div>
-
-                            </div>
-
-                            <div className='form-section'>
-                                <div className='form-section-header'>
-                                    <h3 className='form-section-title'>Dados profissionais</h3>
-                                    <div className='hr'></div>
-                                </div>
-
-                                <div className='form-wrapper'>
-                                    <div className='col-1'>                                 
-                                        <div className='form-input'>
-                                            <label>Username:</label>
-                                            <input 
-                                            style={{border: msg.show && inputs.username === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}}
-                                            onChange={handleChanges} 
-                                            value={inputs.username}  
-                                            name="username" 
-                                            type="text"/>
-                                        </div>   
-                                        <div className='form-input'>
-                                            <label>Email:</label>
-                                            <input 
-                                            style={{border: msg.show && inputs.email === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}}
-                                            onChange={handleChanges} 
-                                            value={inputs.email} 
-                                            name="email" 
-                                            type="email"/>
-                                        </div>                                                                                                          
-                                        </div>
-                                        <div className='col-2'>      
-                                            {
-                                                (params.get('id') === '0' || params.get('copy') === '1') && <div className='form-input'>
-                                                    <label>Senha:</label>
-                                                    <input 
-                                                    style={{border: msg.show && inputs.password === "" ? '2px solid var(--danger)' : '1px solid rgba(73, 73, 73, 0.3)'}}
-                                                    onChange={handleChanges} 
-                                                    value={inputs.password} 
-                                                    name="password" 
-                                                    type="password"/>
-                                                </div> 
-                                            }                                
-                                            
-                                            <div className='form-input'>
-                                                <label>Equipe (Opcional):</label>
-                                                <input 
-                                                onChange={e => {
-                                                    handleChanges(e);
-                                                    setOpenMoreTeamOptions(false)
-                                                }} 
-                                                value={inputs.team} 
-                                                name="team" 
-                                                type="text"/>
-                                                <div className='dropdown'>
-                                                    <i onClick={e => setOpenMoreTeamOptions(!openMoreTeamOptions)} className='fa fa-search search-input'></i>
-                                                    {
-                                                        openMoreTeamOptions && 
-                                                        <div className='menu radio-hidden'>
-                                                            <div className='menu-header'>
-                                                                <h5>Equipes cadastradas</h5>
-                                                            </div>
-                                                            
-                                                        {
-                                                            teamOptions.map((team,i) => {
-                                                                if(team != "") return(
-                                                                    <RadioPill
-                                                                    name="team" 
-                                                                    onClick={handleChanges} 
-                                                                    placeholder={team} 
-                                                                    css='info'
-                                                                    value={team}
-                                                                    defaultChecked={inputs.team == team}
-                                                                    />
-                                                                )
-                                                            })
-                                                        }
-                                                        </div>
-                                                    }
-                                                </div>
-                                                
-                                            </div>
-                                            
-                                                
-                                            
-                                                
-                                            <div>
-                                        </div>                                                                    
-                                    </div>   
-                                </div>
-                            </div>
-                            
-
-                            <div className='wrapper gap-1'>
-                                <Link to="/users" className='btn-custom warning'>Cancelar</Link>
-                                { params.get('id') === '0' && <button name="later" onClick={handleSubmit2} className='btn-custom info' type="button">Salvar Rascunho</button> }
-                                <button name="continuar" className='btn-custom success' type="submit">Próximo</button><h4>Passo 1 de 2</h4>
-                            </div>
-                            
-                        </Form>
-                    </div>
+                <div className='panel-body'>    
+                <div className='form-wrapper'>           
+                    <Form
+                    onSubmit={userFormHandler}
+                    method='post'
+                    >
+                    <h3>Dados pessoais</h3>       
+                    <div className='hr'></div>     
+                    <div className='form-wrapper'>
+                        <div className='form-input'>
+                            <label>Nome:</label>
+                            <input 
+                            style={{border: msg.show && inputs.name === "" ? '2px solid var(--danger)' : '1px solid var(--black05)'}} 
+                            onChange={handleChanges} 
+                            value={inputs.name || ''} 
+                            name="name" 
+                            type="text"/>
+                        </div>                                                                                                                  
                     
+                        <div className='form-input'>
+                            <label>Sobrenome (Opcional):</label>
+                            <input 
+                            onChange={handleChanges} 
+                            value={inputs.lastname || ''} 
+                            name="lastname" 
+                            type="text" />
+                        </div>
+                    </div>
+
+                    <h3>Dados profissionais</h3>
+                    <div className='hr'></div>
+
+                    <div className='form-wrapper'>                                
+                        <div className='form-input'>
+                            <label>Username:</label>
+                            <input 
+                            style={{border: msg.show && inputs.username === "" ? '2px solid var(--danger)' : '1px solid var(--black05)'}}
+                            onChange={handleChanges} 
+                            value={inputs.username || ''}  
+                            name="username" 
+                            type="text"/>
+                        </div>   
+                        <div className='form-input'>
+                            <label>Email:</label>
+                            <input 
+                            style={{border: msg.show && inputs.email === "" ? '2px solid var(--danger)' : '1px solid var(--black05)'}}
+                            onChange={handleChanges} 
+                            value={inputs.email || ''} 
+                            name="email" 
+                            type="email"/>
+                        </div>                                                                                                          
+                    </div>
+
+                    <div className='form-wrapper'>
+                        {
+                            (params.get('id') === '0' || params.get('copy') === '1') && 
+                            <div className='form-input'>
+                                <label>Senha:</label>
+                                <input 
+                                style={{border: msg.show && inputs.password === "" ? '2px solid var(--danger)' : '1px solid var(--black05)'}}
+                                onChange={handleChanges} 
+                                value={inputs.password || ''} 
+                                name="password" 
+                                type="password"/>
+                            </div> 
+                        }                                
+                        
+                        <div className='form-input'>
+                            <label>Equipe (Opcional):</label>
+                            <input 
+                            onChange={e => {
+                                handleChanges(e);
+                                setOpenMoreTeamOptions(false)
+                            }} 
+                            value={inputs.team || ''} 
+                            name="team" 
+                            type="text"/>
+                            <div className='dropdown'>
+                                <i onClick={e => setOpenMoreTeamOptions(!openMoreTeamOptions)} className='fa fa-search search-input'></i>
+                                {
+                                    openMoreTeamOptions && 
+                                    <div className='menu'>
+                                    {
+                                        teamOptions.map((team,i) => {
+                                            if(team !== "") return(
+                                                <RadioPill
+                                                name="team" 
+                                                onClick={handleChanges} 
+                                                placeholder={team} 
+                                                css='info'
+                                                value={team}
+                                                defaultChecked={inputs.team == team}
+                                                />
+                                            )
+                                        })
+                                    }
+                                    </div>
+                                }
+                            </div>
+                            
+                        </div>  
+                    </div>                                                                
+                    <div className='wrapper'>
+                        <Link to="/users" className='btn-custom warning'>Cancelar</Link>
+                        { params.get('id') === '0' && <button name="later" onClick={handleSubmit2} className='btn-custom info' type="button">Salvar Rascunho</button> }
+                        <button name="continuar" className='btn-custom success' type="submit">Próximo</button><h4>Passo 1 de 2</h4>
+                    </div>
+                    </Form> 
+                    </div>   
                 </div>
             </Layout>    
         </>

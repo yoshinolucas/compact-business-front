@@ -18,6 +18,9 @@ import Records from './pages/Records';
 import Accesses from './pages/Accesses';
 import Products from './pages/Products';
 import Business from './pages/Business';
+import FormProduct from './pages/Products/FormProduct';
+import DetailsProduct from './pages/Products/DetailsProduct';
+import FormProductInfo from './pages/Products/FormProduct/FormProductInfo';
 
 const PrivateRoute = ({ component: Component }) => {
   if( isAuthenticated() ) return Component;
@@ -34,7 +37,7 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: "/home",
+    path: "/inicio",
     element: <PrivateRoute component={<Home />} />
   },
   {
@@ -72,6 +75,18 @@ const router = createBrowserRouter([
   {
     path: "/produtos",
     element: <PrivateRoute component={<Products />} />
+  },
+  {
+    path: "/produtos/edit",
+    element: <PrivateRoute component={<FormProduct />} />
+  },
+  {
+    path: "/produtos/detalhes",
+    element: <PrivateRoute component={<DetailsProduct/>} />
+  },
+  {
+    path: "/produtos/edit/produto-info",
+    element: <PrivateRoute component={<FormProductInfo/>} />
   }
   
   
